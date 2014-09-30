@@ -1,4 +1,4 @@
 contrail-heat
 =============
 
-Openstack heat plugin and resources
+Opencontrail heat plugin and resources
