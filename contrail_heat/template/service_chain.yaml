@@ -1,4 +1,4 @@
-heat_template_version: 2014-09-26
+heat_template_version: 2013-05-23
 
 description: >
   HOT template to creates two virtual network with one subnet each. 
