@@ -10,7 +10,7 @@ def requirements(filename):
     return lines
 
 setup(
-    name='heat_contrail',
+    name='contrail_heat',
     version='0.1dev',
     packages=find_packages(),
     package_data={'': ['*.html', '*.css', '*.xml']},
