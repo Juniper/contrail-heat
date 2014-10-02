@@ -13,7 +13,7 @@ setup(
     name='contrail_heat',
     version='0.1dev',
     packages=find_packages(),
-    package_data={'': ['*.html', '*.css', '*.xml']},
+    package_data={'': ['*.env', '*.yaml', '*.xml']},
     zip_safe=False,
     long_description="Contrail heat resources and templates",
 
