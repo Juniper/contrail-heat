@@ -2,7 +2,7 @@ from heat.engine import constraints
 from heat.engine import properties
 from heat.openstack.common import log as logging
 from vnc_api.vnc_api import *
-from heat.engine.resources.neutron.contrail import ContrailResource
+from contrail_heat.resources.contrail import ContrailResource
 
 logger = logging.getLogger(__name__)
 

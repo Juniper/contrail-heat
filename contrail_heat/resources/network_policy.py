@@ -4,7 +4,7 @@ from heat.engine import clients
 from heat.engine.resources.neutron import neutron
 from heat.engine import properties
 from vnc_api.vnc_api import *
-from heat.engine.resources.neutron.contrail import ContrailResource
+from contrail_heat.resources.contrail import ContrailResource
 
 if clients.neutronclient is not None:
     from neutronclient.common.exceptions import NeutronClientException
