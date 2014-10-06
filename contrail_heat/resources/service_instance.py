@@ -189,7 +189,7 @@ class HeatServiceInstance(ContrailResource):
         status = 'INACTIVE'
         inactive_count = 0
         active_count = 0
-        for vms in si_obj.get_virtual_machine_back_refs():
+        for vms in si_obj.get_virtual_machine_back_refs() or []:
             svm = {}
             vm = self.nova().servers.get(vms['to'][0])
             svm['vm_id'] = vm.id
@@ -203,7 +203,7 @@ class HeatServiceInstance(ContrailResource):
         dict['virtual_machines'] = svms
         if inactive_count and active_count:
             status = "PARTIALLY ACTIVE"
-        elif active_count == len(si_obj.get_virtual_machine_back_refs()):
+        elif active_count == len(si_obj.get_virtual_machine_back_refs() or []):
             status = "ACTIVE"
         dict['status'] = status
         dict['active_service_vms'] = active_count
