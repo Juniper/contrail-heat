@@ -158,23 +158,23 @@ class HeatServiceInstance(ContrailResource):
             if_type = ServiceInstanceInterfaceType(virtual_network=vn)
             si_prop.add_interface_list(if_type)
 
-         mgmt_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
-         if mgmt_network != "auto":
-             fq_name = self.vnc_lib().id_to_fq_name(mgmt_network)
-             fq_name_str = ":".join(fq_name)
-             si_prop.set_management_virtual_network(fq_name_str)
+        mgmt_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
+        if mgmt_network != "auto":
+            fq_name = self.vnc_lib().id_to_fq_name(mgmt_network)
+            fq_name_str = ":".join(fq_name)
+            si_prop.set_management_virtual_network(fq_name_str)
 
-         left_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
-         if left_network != "auto":
-             fq_name = self.vnc_lib().id_to_fq_name(left_network)
-             fq_name_str = ":".join(fq_name)
-             si_prop.set_left_virtual_network(fq_name_str)
+        left_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
+        if left_network != "auto":
+            fq_name = self.vnc_lib().id_to_fq_name(left_network)
+            fq_name_str = ":".join(fq_name)
+            si_prop.set_left_virtual_network(fq_name_str)
 
-         right_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
-         if right_network != "auto":
-             fq_name = self.vnc_lib().id_to_fq_name(right_network)
-             fq_name_str = ":".join(fq_name)
-             si_prop.set_right_virtual_network(fq_name_str)
+        right_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
+        if right_network != "auto":
+            fq_name = self.vnc_lib().id_to_fq_name(right_network)
+            fq_name_str = ":".join(fq_name)
+            si_prop.set_right_virtual_network(fq_name_str)
 
         if self.properties[self.SCALE_OUT] is None:
             max_instances = 1
