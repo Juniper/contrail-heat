@@ -164,13 +164,13 @@ class HeatServiceInstance(ContrailResource):
             fq_name_str = ":".join(fq_name)
             si_prop.set_management_virtual_network(fq_name_str)
 
-        left_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
+        left_network = self.properties[self.INTERFACE_LIST][1][self.VIRTUAL_NETWORK]
         if left_network != "auto":
             fq_name = self.vnc_lib().id_to_fq_name(left_network)
             fq_name_str = ":".join(fq_name)
             si_prop.set_left_virtual_network(fq_name_str)
 
-        right_network = self.properties[self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
+        right_network = self.properties[self.INTERFACE_LIST][2][self.VIRTUAL_NETWORK]
         if right_network != "auto":
             fq_name = self.vnc_lib().id_to_fq_name(right_network)
             fq_name_str = ":".join(fq_name)
