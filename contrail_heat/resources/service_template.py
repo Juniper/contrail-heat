@@ -159,7 +159,7 @@ class HeatServiceTemplate(ContrailResource):
         dict['name'] = st_obj.get_display_name()
         dict['fq_name'] = st_obj.get_fq_name_str()
         sis = []
-        for si_ref in st_obj.get_service_instance_back_refs():
+        for si_ref in st_obj.get_service_instance_back_refs() or []:
             si_info = {}
             si_info['name'] = ':'.join(si_ref['to'])
             si_info['uuid'] = si_ref['uuid']
