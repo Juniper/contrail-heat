@@ -153,17 +153,8 @@ class HeatServiceInstance(ContrailResource):
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
         si_obj = vnc_api.ServiceInstance(
             name=self.properties[self.NAME], parent_obj=project_obj)
-        si_uuid = self.vnc_lib().service_instance_create(si_obj)
 
         si_prop = vnc_api.ServiceInstanceType()
-
-        for intf in self.properties[self.INTERFACE_LIST]:
-            if intf[self.VIRTUAL_NETWORK] == "auto":
-                vn = ""
-            else:
-                vn = intf[self.VIRTUAL_NETWORK]
-            if_type = vnc_api.ServiceInstanceInterfaceType(virtual_network=vn)
-            si_prop.add_interface_list(if_type)
 
         mgmt_network = self.properties[
             self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
@@ -171,6 +162,11 @@ class HeatServiceInstance(ContrailResource):
             fq_name = self.vnc_lib().id_to_fq_name(mgmt_network)
             fq_name_str = ":".join(fq_name)
             si_prop.set_management_virtual_network(fq_name_str)
+            vn = fq_name_str
+        else:
+            vn = ""
+        si_prop.add_interface_list(
+            vnc_api.ServiceInstanceInterfaceType(virtual_network=vn))
 
         left_network = self.properties[
             self.INTERFACE_LIST][1][self.VIRTUAL_NETWORK]
@@ -178,6 +174,11 @@ class HeatServiceInstance(ContrailResource):
             fq_name = self.vnc_lib().id_to_fq_name(left_network)
             fq_name_str = ":".join(fq_name)
             si_prop.set_left_virtual_network(fq_name_str)
+            vn = fq_name_str
+        else:
+            vn = ""
+        si_prop.add_interface_list(
+            vnc_api.ServiceInstanceInterfaceType(virtual_network=vn))
 
         right_network = self.properties[
             self.INTERFACE_LIST][2][self.VIRTUAL_NETWORK]
@@ -185,6 +186,11 @@ class HeatServiceInstance(ContrailResource):
             fq_name = self.vnc_lib().id_to_fq_name(right_network)
             fq_name_str = ":".join(fq_name)
             si_prop.set_right_virtual_network(fq_name_str)
+            vn = fq_name_str
+        else:
+            vn = ""
+        si_prop.add_interface_list(
+            vnc_api.ServiceInstanceInterfaceType(virtual_network=vn))
 
         if self.properties[self.SCALE_OUT] is None:
             max_instances = 1
@@ -202,7 +208,7 @@ class HeatServiceInstance(ContrailResource):
         st_obj = self.vnc_lib().service_template_read(id=st_obj.uuid)
         si_obj.set_service_template(st_obj)
 
-        self.vnc_lib().service_instance_update(si_obj)
+        si_uuid = self.vnc_lib().service_instance_create(si_obj)
         self.resource_id_set(si_uuid)
 
     def _show_resource(self):
@@ -211,8 +217,6 @@ class HeatServiceInstance(ContrailResource):
         dict['name'] = si_obj.get_display_name()
         dict['fq_name'] = si_obj.get_fq_name_str()
         dict['tenant_id'] = si_obj.parent_uuid
-        status = 'INACTIVE'
-        dict['virtual_machines'] = []
         svms = []
         status = 'INACTIVE'
         inactive_count = 0
