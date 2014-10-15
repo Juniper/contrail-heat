@@ -131,8 +131,8 @@ class HeatServiceTemplate(ContrailResource):
     attributes_schema = {
         "name": _("The name of the Service Template."),
         "fq_name": _("The FQ name of the Service Template."),
-        "service_instaces": _("Service Instances launched with this service "
-                              "template."),
+        "service_instances": _("Service Instances launched with this service "
+                               "template."),
         "show": _("All attributes."),
     }
 
@@ -143,7 +143,6 @@ class HeatServiceTemplate(ContrailResource):
             fq_name=[self.properties[self.DOMAIN]])
         st_obj = vnc_api.ServiceTemplate(name=self.properties[self.NAME],
                                          parent_obj=domain)
-        st_uuid = self.vnc_lib().service_template_create(st_obj)
         svc_properties = vnc_api.ServiceTemplateType()
         svc_properties.set_image_name(self.properties[self.IMAGE_NAME])
         svc_properties.set_flavor(self.properties[self.FLAVOR])
@@ -153,6 +152,8 @@ class HeatServiceTemplate(ContrailResource):
         svc_properties.set_service_type(self.properties[self.SERVICE_TYPE])
         svc_properties.set_service_virtualization_type(
             self.properties[self.SERVICE_VIRT_TYPE])
+        svc_properties.set_ordered_interfaces(
+            self.properties[self.ORDERED_INTERFACES])
         # set interface list
         for itf in self.properties[self.INTERFACE_TYPE]:
             if_type = vnc_api.ServiceTemplateInterfaceType(
@@ -162,7 +163,7 @@ class HeatServiceTemplate(ContrailResource):
             if_type.set_static_route_enable(itf[self.STATIC_ROUTE_ENABLE])
             svc_properties.add_interface_type(if_type)
         st_obj.set_service_template_properties(svc_properties)
-        self.vnc_lib().service_template_update(st_obj)
+        st_uuid = self.vnc_lib().service_template_create(st_obj)
         self.resource_id_set(st_uuid)
 
     def _show_resource(self):
