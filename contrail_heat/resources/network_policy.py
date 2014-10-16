@@ -1,14 +1,11 @@
 from heat.engine import constraints
-from heat.common import exception
 from heat.engine import clients
 from heat.engine import properties
 from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 
-if clients.neutronclient is not None:
-    from neutronclient.common.exceptions import NeutronClientException
-
 from heat.openstack.common import log as logging
+import uuid
 
 logger = logging.getLogger(__name__)
 
@@ -104,45 +101,17 @@ class NetworkPolicy(ContrailResource):
         )
     }
     attributes_schema = {
-        "status": _("The status of the policy."),
         "name": _("The name of the policy."),
         "fq_name": _("FQ name of this policy."),
         "tenant_id": _("The tenant owning this network."),
+        "rules": _("List of rules"),
         "show": _("All attributes."),
     }
 
-    @staticmethod
-    def handle_get_network_policy_attributes(name, key, attributes):
-        '''
-        Support method for responding to FnGetAtt
-        '''
-        if key == 'show':
-            return attributes
-
-        if key in attributes.keys():
-            if key == "fq_name":
-                fq_name = attributes[key]
-                return ':'.join(fq_name)
-            else:
-                return attributes[key]
-
-        raise exception.InvalidTemplateAttribute(resource=name, key=key)
-
-    def _resolve_attribute(self, name):
-        try:
-            attributes = self._show_resource()
-        except NeutronClientException as ex:
-            logger.warn(_("failed to fetch resource attributes: %s") %
-                        str(ex))
-            return None
-        return self.handle_get_network_policy_attributes(self.name,
-                                                         name,
-                                                         attributes)
-
     def fix_apply_service(self, props):
         for policy_rule in props['entries']['policy_rule']:
-            index = 0
-            for service in policy_rule['action_list']['apply_service']:
+            for index, service in enumerate(
+                    policy_rule['action_list']['apply_service']):
                 try:
                     si_obj = self.vnc_lib().service_instance_read(id=service)
                 except:
@@ -150,20 +119,17 @@ class NetworkPolicy(ContrailResource):
                         fq_name=service)
                 policy_rule['action_list']['apply_service'][
                     index] = si_obj.get_fq_name_str()
-                index += 1
 
     def fix_vn_name(self, props):
         for policy_rule in props['entries']['policy_rule']:
             for dest_address in policy_rule['dst_addresses']:
-                vn_name_or_id = dest_address['virtual_network']
-                fq_name = self.neutron().show_network(
-                    vn_name_or_id)['network']['contrail:fq_name']
-                dest_address['virtual_network'] = ':'.join(fq_name)
+                dest_address['virtual_network'] = ':'.join(
+                    self.vnc_lib().id_to_fq_name(
+                        dest_address['virtual_network']))
             for src_address in policy_rule['src_addresses']:
-                vn_name_or_id = src_address['virtual_network']
-                fq_name = self.neutron().show_network(
-                    vn_name_or_id)['network']['contrail:fq_name']
-                src_address['virtual_network'] = ':'.join(fq_name)
+                src_address['virtual_network'] = ':'.join(
+                    self.vnc_lib().id_to_fq_name(
+                        src_address['virtual_network']))
 
     def handle_create(self):
         props = self.prepare_properties(
@@ -171,24 +137,55 @@ class NetworkPolicy(ContrailResource):
             self.physical_resource_name())
         self.fix_vn_name(props)
         self.fix_apply_service(props)
-        policy = self.neutron().create_policy({'policy': props})['policy']
-        self.resource_id_set(policy['id'])
+        tenant_id = self.stack.context.tenant_id
+        project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
+        np_obj = vnc_api.NetworkPolicy(name=self.properties[self.NAME],
+                                       parent_obj=project_obj)
+        np_obj.set_network_policy_entries(
+            vnc_api.PolicyEntriesType.factory(**props['entries']))
+        np_uuid = self.vnc_lib().network_policy_create(np_obj)
+        self.resource_id_set(np_uuid)
 
     def _show_resource(self):
-        return self.neutron().show_policy(
-            self.resource_id)['policy']
+        np_obj = self.vnc_lib().network_policy_read(id=self.resource_id)
+        dict = {}
+        dict['name'] = np_obj.get_display_name()
+        dict['fq_name'] = np_obj.get_fq_name_str()
+        rules = []
+        entries = np_obj.get_network_policy_entries()
+        if entries:
+            for rule in entries.get_policy_rule():
+                policy_rule = {}
+                policy_rule['direction'] = rule.get_direction()
+                policy_rule['protocol'] = rule.get_protocol()
+                policy_rule['dst_addresses'] = []
+                for addr in rule.get_dst_addresses() or []:
+                    policy_rule['dst_addresses'].append(
+                        addr.get_virtual_network())
+                a_list = rule.get_action_list()
+                policy_rule['action_list'] = {
+                    'simple_action': a_list.get_simple_action(),
+                    'apply_service': a_list.get_apply_service()
+                }
+                policy_rule['dst_ports'] = rule.get_dst_ports()
+                policy_rule['application'] = rule.get_application()
+                policy_rule['src_addresses'] = []
+                for addr in rule.get_src_addresses() or []:
+                    policy_rule['src_addresses'].append(
+                        addr.get_virtual_network())
+                policy_rule['src_ports'] = rule.get_src_ports()
+                rules.append(policy_rule)
+        dict['rules'] = rules
+        return dict
 
     def handle_delete(self):
         try:
-            self.neutron().delete_policy(self.resource_id)
+            self.vnc_lib().network_policy_delete(id=self.resource_id)
         except Exception:
             pass
 
 
 def resource_mapping():
-    if clients.neutronclient is None:
-        return {}
-
     return {
         'OS::Contrail::NetworkPolicy': NetworkPolicy,
     }
