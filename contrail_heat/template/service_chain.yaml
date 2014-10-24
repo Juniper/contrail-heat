@@ -2,29 +2,14 @@ heat_template_version: 2013-05-23
 
 description: >
   HOT template to creates two virtual network with one subnet each. 
-  Create a service template and a service instance
+  Create a service instance
   Creates a network policy for applying service between two VNs created before.
   Attach the network policy to two virtual networks
 
 parameters:
-  name:
-    type: string
-    description: Name of service template
-  mode:
-    type: string
-    description: service mode
-  type:
-    type: string
-    description: service type
-  image:
-    type: string
-    description: Name of the image
-  flavor:
-    type: string
-    description: Flavor
   policy_name:
     type: string
-    description: Virtual network id
+    description: Policy Name
   direction:
     type: string
     description: Direction of Policy
@@ -58,48 +43,16 @@ parameters:
   private_net_2_pool_end:
     type: string
     description: End of private network IP address allocation pool
+  private_template:
+    type: string
+    default: TestTemplate1
+    description: service template name or ID
+  private_instance_name:
+    type: string
+    default: TestInstance1
+    description: service instance name
 
 resources:
-  service_template:
-    type: OS::Contrail::ServiceTemplate
-    properties:
-      name: { get_param: name }
-      service_mode: { get_param: mode }
-      service_type: { get_param: type }
-      image_name: { get_param: image }
-      flavor: { get_param: flavor }
-      interface_type: [
-          {
-              service_interface_type: "management"
-          },
-          {
-              service_interface_type: "left"
-          },
-          {
-              service_interface_type: "right"
-          },
-      ]
-
-  service_instance:
-    type: OS::Contrail::ServiceInstance
-    depends_on: service_template
-    properties:
-      name: { get_param: name }
-      service_template: { get_resource:  service_template}
-      scale_out: 
-          max_instances: 3
-      interface_list: [
-          {
-              virtual_network: "auto"
-          },
-          {
-              virtual_network: "auto"
-          },
-          {
-              virtual_network: "auto"
-          },
-      ]
-
   private_net_1:
     type: OS::Neutron::Net
     properties:
@@ -112,6 +65,7 @@ resources:
 
   private_subnet_1:
     type: OS::Neutron::Subnet
+    depends_on: private_net_1
     properties:
       network_id: { get_resource: private_net_1 }
       cidr: { get_param: private_net_1_cidr }
@@ -122,6 +76,7 @@ resources:
 
   private_subnet_2:
     type: OS::Neutron::Subnet
+    depends_on: private_net_2
     properties:
       network_id: { get_resource: private_net_2 }
       cidr: { get_param: private_net_2_cidr }
@@ -129,6 +84,26 @@ resources:
       allocation_pools:
         - start: { get_param: private_net_2_pool_start }
           end: { get_param: private_net_2_pool_end }
+
+  service_instance:
+    type: OS::Contrail::ServiceInstance
+    depends_on: [private_subnet_1, private_subnet_2]
+    properties:
+      name: { get_param: private_instance_name }
+      service_template: { get_param:  private_template}
+      scale_out: 
+          max_instances: 1
+      interface_list: [
+          {
+              virtual_network: "auto"
+          },
+          {
+              virtual_network: {get_resource: private_net_1}
+          },
+          {
+              virtual_network: {get_resource: private_net_2}
+          },
+      ]
 
   private_policy:
     type: OS::Contrail::NetworkPolicy
@@ -161,9 +136,6 @@ resources:
       policy: { get_attr: [private_policy, fq_name] }
 
 outputs:
-  service_template_fq_name:
-    description: FQ name of the service template
-    value: { get_attr: [ service_template, fq_name] }
   service_instance_fq_name:
     description: FQ name of the service template
     value: { get_attr: [ service_instance, fq_name] }

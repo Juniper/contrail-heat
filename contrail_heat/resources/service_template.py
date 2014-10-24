@@ -10,11 +10,13 @@ logger = logging.getLogger(__name__)
 class HeatServiceTemplate(ContrailResource):
     PROPERTIES = (
         NAME, DOMAIN, SERVICE_MODE, SERVICE_TYPE, IMAGE_NAME,
-        SERVICE_SCALING, INTERFACE_TYPE, FLAVOR, ORDERED_INTERFACES,
+        SERVICE_SCALING, SERVICE_INTERFACE_TYPE_LIST, SHARED_IP_LIST,
+        STATIC_ROUTES_LIST, FLAVOR, ORDERED_INTERFACES,
         SERVICE_VIRT_TYPE, AVAILABILITY_ZONE_ENABLE
     ) = (
         'name', 'domain', 'service_mode', 'service_type', 'image_name',
-        'service_scaling', 'interface_type', 'flavor', 'ordered_interfaces',
+        'service_scaling', 'service_interface_type_list', 'shared_ip_list',
+        'static_routes_list', 'flavor', 'ordered_interfaces',
         'service_virtualization_type', 'availability_zone_enable'
     )
 
@@ -68,34 +70,32 @@ class HeatServiceTemplate(ContrailResource):
             update_allowed=False,
             default=False,
         ),
-        INTERFACE_TYPE: properties.Schema(
+        SERVICE_INTERFACE_TYPE_LIST: properties.Schema(
             properties.Schema.LIST,
             _('An ordered list of interfaces to be added to this service'),
-            schema=properties.Schema(
-                properties.Schema.MAP,
-                schema={
-                    SERVICE_INTERFACE_TYPE: properties.Schema(
-                        properties.Schema.STRING,
-                        _('Service Interface type'),
-                        required=True,
-                        constraints=[
-                            constraints.AllowedValues(['management', 'left',
-                                                       'right', 'other']),
-                        ],
-                    ),
-                    SHARED_IP: properties.Schema(
-                        properties.Schema.BOOLEAN,
-                        _('IP is shared for this interface'),
-                        default=False,
-                    ),
-                    STATIC_ROUTE_ENABLE: properties.Schema(
-                        properties.Schema.BOOLEAN,
-                        _('Static routes enabled'),
-                        default=False,
-                    ),
-                },
-            ),
             required=True,
+            constraints=[
+                constraints.AllowedValues(['management', 'left',
+                                           'right', 'other']),
+            ],
+            update_allowed=False
+        ),
+        SHARED_IP_LIST: properties.Schema(
+            properties.Schema.LIST,
+            _('An ordered list of shared ip enabled for each interface'),
+            required=True,
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
+            update_allowed=False
+        ),
+        STATIC_ROUTES_LIST: properties.Schema(
+            properties.Schema.LIST,
+            _('An ordered list of static routes enabled for each interface'),
+            required=True,
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
             update_allowed=False
         ),
         FLAVOR: properties.Schema(
@@ -155,12 +155,28 @@ class HeatServiceTemplate(ContrailResource):
         svc_properties.set_ordered_interfaces(
             self.properties[self.ORDERED_INTERFACES])
         # set interface list
-        for itf in self.properties[self.INTERFACE_TYPE]:
-            if_type = vnc_api.ServiceTemplateInterfaceType(
-                shared_ip=itf[self.SHARED_IP])
-            if_type.set_service_interface_type(
-                itf[self.SERVICE_INTERFACE_TYPE])
-            if_type.set_static_route_enable(itf[self.STATIC_ROUTE_ENABLE])
+        itf_list = self.properties[self.SERVICE_INTERFACE_TYPE_LIST]
+        for itf in itf_list:
+            index = itf_list.index(itf)
+            try:
+                shared_ip = self.properties[self.SHARED_IP_LIST][index]
+                if shared_ip == 'True':
+                    shared_ip_val = True
+                else:
+                    shared_ip_val = False
+            except IndexError:
+                shared_ip_val = False
+            try:
+                static_route = self.properties[self.STATIC_ROUTES_LIST][index]
+                if static_route == 'True':
+                    static_route_val = True
+                else:
+                    static_route_val = False
+            except IndexError:
+                static_route_val = False
+            if_type = vnc_api.ServiceTemplateInterfaceType(shared_ip=shared_ip_val)
+            if_type.set_service_interface_type(itf)
+            if_type.set_static_route_enable(static_route_val)
             svc_properties.add_interface_type(if_type)
         st_obj.set_service_template_properties(svc_properties)
         st_uuid = self.vnc_lib().service_template_create(st_obj)

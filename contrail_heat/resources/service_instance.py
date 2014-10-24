@@ -147,7 +147,7 @@ class HeatServiceInstance(ContrailResource):
                 id=self.properties[self.SERVICE_TEMPLATE])
         except vnc_api.NoIdError:
             st_obj = self.vnc_lib().service_template_read(
-                name=self.properties[self.SERVICE_TEMPLATE])
+                fq_name_str=self.properties[self.SERVICE_TEMPLATE])
 
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
@@ -156,41 +156,28 @@ class HeatServiceInstance(ContrailResource):
 
         si_prop = vnc_api.ServiceInstanceType()
 
-        mgmt_network = self.properties[
-            self.INTERFACE_LIST][0][self.VIRTUAL_NETWORK]
-        if mgmt_network != "auto":
-            fq_name = self.vnc_lib().id_to_fq_name(mgmt_network)
+        for intf in self.properties[self.INTERFACE_LIST]:
+            if intf[self.VIRTUAL_NETWORK] == "auto":
+                vn = ""
+            else:
+                vn = intf[self.VIRTUAL_NETWORK]
+            if_type = vnc_api.ServiceInstanceInterfaceType(virtual_network=vn)
+            si_prop.add_interface_list(if_type)
+
+        if self.properties[self.INTERFACE_LIST][0]['virtual_network'] != "auto":
+            fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][0]['virtual_network'])
             fq_name_str = ":".join(fq_name)
             si_prop.set_management_virtual_network(fq_name_str)
-            vn = fq_name_str
         else:
-            vn = ""
-        si_prop.add_interface_list(
-            vnc_api.ServiceInstanceInterfaceType(virtual_network=vn))
+            si_prop.set_management_virtual_network("")
 
-        left_network = self.properties[
-            self.INTERFACE_LIST][1][self.VIRTUAL_NETWORK]
-        if left_network != "auto":
-            fq_name = self.vnc_lib().id_to_fq_name(left_network)
-            fq_name_str = ":".join(fq_name)
-            si_prop.set_left_virtual_network(fq_name_str)
-            vn = fq_name_str
-        else:
-            vn = ""
-        si_prop.add_interface_list(
-            vnc_api.ServiceInstanceInterfaceType(virtual_network=vn))
+        fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][1]['virtual_network'])
+        fq_name_str = ":".join(fq_name)
+        si_prop.set_left_virtual_network(fq_name_str)
 
-        right_network = self.properties[
-            self.INTERFACE_LIST][2][self.VIRTUAL_NETWORK]
-        if right_network != "auto":
-            fq_name = self.vnc_lib().id_to_fq_name(right_network)
-            fq_name_str = ":".join(fq_name)
-            si_prop.set_right_virtual_network(fq_name_str)
-            vn = fq_name_str
-        else:
-            vn = ""
-        si_prop.add_interface_list(
-            vnc_api.ServiceInstanceInterfaceType(virtual_network=vn))
+        fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][2]['virtual_network'])
+        fq_name_str = ":".join(fq_name)
+        si_prop.set_right_virtual_network(fq_name_str)
 
         if self.properties[self.SCALE_OUT] is None:
             max_instances = 1
