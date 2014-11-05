@@ -171,13 +171,19 @@ class HeatServiceInstance(ContrailResource):
         else:
             si_prop.set_management_virtual_network("")
 
-        fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][1]['virtual_network'])
-        fq_name_str = ":".join(fq_name)
-        si_prop.set_left_virtual_network(fq_name_str)
+        if self.properties[self.INTERFACE_LIST][1]['virtual_network'] != "auto":
+            fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][1]['virtual_network'])
+            fq_name_str = ":".join(fq_name)
+            si_prop.set_left_virtual_network(fq_name_str)
+        else:
+            si_prop.set_left_virtual_network("")
 
-        fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][2]['virtual_network'])
-        fq_name_str = ":".join(fq_name)
-        si_prop.set_right_virtual_network(fq_name_str)
+        if self.properties[self.INTERFACE_LIST][2]['virtual_network'] != "auto":
+            fq_name = self.vnc_lib().id_to_fq_name(self.properties[self.INTERFACE_LIST][2]['virtual_network'])
+            fq_name_str = ":".join(fq_name)
+            si_prop.set_right_virtual_network(fq_name_str)
+        else:
+            si_prop.set_right_virtual_network("")
 
         if self.properties[self.SCALE_OUT] is None:
             max_instances = 1
