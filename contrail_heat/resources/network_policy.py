@@ -36,6 +36,52 @@ class NetworkPolicy(ContrailResource):
                         _('Protocol to match'),
                         default='any'
                     ),
+		    "dst_ports": properties.Schema(
+                        properties.Schema.LIST,
+                        _('Array of dst ports to match'),
+                        required=False,
+                        default=[],
+ 			schema=properties.Schema(
+                            properties.Schema.MAP,
+                            schema={
+                                "start_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('Start Port to match'),
+                                    required=False,
+                                    default=-1
+                                ),
+                                "end_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('EndPort to match'),
+                                    required=False,
+                                    default=-1
+                                ),
+                           }
+			)
+                    ),
+                    "src_ports": properties.Schema(
+                        properties.Schema.LIST,
+                        _('Array of src ports to match'),
+                        required=False,
+                        default=[],
+  			schema=properties.Schema(
+                            properties.Schema.MAP,
+                            schema={
+                                "start_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('Start Port to match'),
+                                    required=False,
+                                    default=-1
+                                ),
+                                "end_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('EndPort to match'),
+                                    required=False,
+                                    default=-1
+                                ),
+                            }
+			)
+                    ),
                     "dst_addresses": properties.Schema(
                         properties.Schema.LIST,
                         _('Array of dst addresses to match'),
