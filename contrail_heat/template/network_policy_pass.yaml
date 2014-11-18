@@ -12,7 +12,19 @@ parameters:
   direction:
     type: string
     description: Direction of Policy
-  apply_service:
+  start_src_ports:
+    type: number
+    description: Start of src port
+  end_src_ports:
+    type: number
+    description: End of src port
+  start_dst_ports:
+    type: number
+    description: Start of dst port
+  end_dst_ports:
+    type: number
+    description: End of dst port
+  action:
     type: string
     description: service to apply
   private_net_1_name:
@@ -86,8 +98,10 @@ resources:
               { 
                 "direction": { get_param: direction }, 
                 "protocol": "any", 
+                "src_ports": [{"start_port": {get_param: start_src_ports}, "end_port": {get_param: end_src_ports}}],
+                "dst_ports": [{"start_port": {get_param: start_dst_ports}, "end_port": {get_param: end_dst_ports}}],
                 "dst_addresses": [{ "virtual_network": {get_resource: private_net_1}}], 
-                "action_list": {"apply_service": [{get_param: apply_service}]}, 
+                "action_list": {"simple_action": {get_param: action}}, 
                 "src_addresses": [{ "virtual_network": {get_resource: private_net_2}}] 
               }, 
         ]
