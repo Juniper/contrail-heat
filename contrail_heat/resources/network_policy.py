@@ -36,6 +36,46 @@ class NetworkPolicy(ContrailResource):
                         _('Protocol to match'),
                         default='any'
                     ),
+                    "src_ports": properties.Schema(
+                        properties.Schema.LIST,
+                        _('Array of src ports to match'),
+                        required=True,
+                        schema=properties.Schema(
+                            properties.Schema.MAP,
+                            schema={
+                                "start_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('start port to match'),
+                                    required=True
+                                ),
+                                "end_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('end port to match'),
+                                    required=True
+                                ),
+                            }
+                        )
+                    ),
+                    "dst_ports": properties.Schema(
+                        properties.Schema.LIST,
+                        _('Array of dst ports to match'),
+                        required=True,
+                        schema=properties.Schema(
+                            properties.Schema.MAP,
+                            schema={
+                                "start_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('start port to match'),
+                                    required=True
+                                ),
+                                "end_port": properties.Schema(
+                                    properties.Schema.INTEGER,
+                                    _('end port to match'),
+                                    required=True
+                                ),
+                            }
+                        )
+                    ),
                     "dst_addresses": properties.Schema(
                         properties.Schema.LIST,
                         _('Array of dst addresses to match'),
@@ -79,7 +119,6 @@ class NetworkPolicy(ContrailResource):
                             "apply_service": properties.Schema(
                                 properties.Schema.LIST,
                                 _('Apply service'),
-                                required=True
                             ),
                         }
                     ),
@@ -111,7 +150,7 @@ class NetworkPolicy(ContrailResource):
     def fix_apply_service(self, props):
         for policy_rule in props['entries']['policy_rule']:
             for index, service in enumerate(
-                    policy_rule['action_list']['apply_service']):
+                    policy_rule['action_list']['apply_service'] or []):
                 try:
                     si_obj = self.vnc_lib().service_instance_read(id=service)
                 except:
