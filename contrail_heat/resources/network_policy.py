@@ -155,7 +155,7 @@ class NetworkPolicy(ContrailResource):
                     si_obj = self.vnc_lib().service_instance_read(id=service)
                 except:
                     si_obj = self.vnc_lib().service_instance_read(
-                        fq_name=service)
+                        fq_name_str=service)
                 policy_rule['action_list']['apply_service'][
                     index] = si_obj.get_fq_name_str()
 
