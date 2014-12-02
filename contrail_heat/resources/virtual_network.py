@@ -1,7 +1,6 @@
 import uuid
 
 from contrail_heat.resources import contrail
-from heat.common.i18n import _
 from heat.engine import properties
 from heat.openstack.common import log as logging
 from vnc_api import vnc_api
