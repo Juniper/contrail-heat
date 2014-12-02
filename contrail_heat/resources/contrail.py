@@ -1,7 +1,6 @@
 import ConfigParser
 
 from cfgm_common import exceptions as cfgm_exp
-from heat.common.i18n import _
 from heat.engine import resource
 from heat.openstack.common import log as logging
 from vnc_api import vnc_api
