@@ -1,0 +1,33 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to create a security group
+
+parameters:
+  name:
+    type: string
+    description: Name of security group
+
+resources:
+  security_group:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      description: Create a security group with rules
+      name: security-group
+      rules: [
+        {
+          remote_ip_prefix: 0.0.0.0/0,
+          protocol: tcp,
+          port_range_min: 22,
+          port_range_max: 22
+        },
+        {
+          remote_ip_prefix: 0.0.0.0/0,
+          protocol: icmp
+        },
+      ]
+
+outputs:
+  security_group_name:
+    description: Name of the security group
+    value: { get_attr: [ security_group, name] }
