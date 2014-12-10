@@ -171,9 +171,7 @@ class NetworkPolicy(ContrailResource):
                         src_address['virtual_network']))
 
     def handle_create(self):
-        props = self.prepare_properties(
-            self.properties,
-            self.physical_resource_name())
+        props = self.properties
         self.fix_vn_name(props)
         self.fix_apply_service(props)
         tenant_id = self.stack.context.tenant_id
