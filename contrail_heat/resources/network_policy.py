@@ -155,7 +155,7 @@ class NetworkPolicy(ContrailResource):
                     si_obj = self.vnc_lib().service_instance_read(id=service)
                 except:
                     si_obj = self.vnc_lib().service_instance_read(
-                        fq_name=service)
+                        fq_name_str=service)
                 policy_rule['action_list']['apply_service'][
                     index] = si_obj.get_fq_name_str()
 
@@ -171,9 +171,7 @@ class NetworkPolicy(ContrailResource):
                         src_address['virtual_network']))
 
     def handle_create(self):
-        props = self.prepare_properties(
-            self.properties,
-            self.physical_resource_name())
+        props = self.properties
         self.fix_vn_name(props)
         self.fix_apply_service(props)
         tenant_id = self.stack.context.tenant_id
