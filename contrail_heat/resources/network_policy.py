@@ -6,6 +6,7 @@ from contrail_heat.resources.contrail import ContrailResource
 
 from heat.openstack.common import log as logging
 import uuid
+import copy
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +160,7 @@ class NetworkPolicy(ContrailResource):
                 policy_rule['action_list']['apply_service'][
                     index] = si_obj.get_fq_name_str()
 
-    def fix_vn_name(self, props):
+    def fix_vn_uuid_to_fqname(self, props):
         for policy_rule in props['entries']['policy_rule']:
             for dest_address in policy_rule['dst_addresses']:
                 dest_address['virtual_network'] = ':'.join(
@@ -171,8 +172,9 @@ class NetworkPolicy(ContrailResource):
                         src_address['virtual_network']))
 
     def handle_create(self):
-        props = self.properties
-        self.fix_vn_name(props)
+        props = {}
+        props['entries'] = copy.deepcopy(self.properties['entries'])
+        self.fix_vn_uuid_to_fqname(props)
         self.fix_apply_service(props)
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
