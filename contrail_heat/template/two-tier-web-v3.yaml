@@ -1,0 +1,111 @@
+heat_template_version: 2013-05-23
+
+parameters:
+   vn_1_name:
+      type: string
+      label: Name for Network 1
+      description: Web tier network name
+   vn_1_cidr:
+      type: string
+      label: Address block for Network 1 (CIDR notation)
+      description: Web tier network block (CIDR notation)
+   vn_2_name:
+      type: string
+      label: Name for Network 2
+      description: Db tier network name
+   vn_2_cidr:
+      type: string
+      label: Address block for Network 2 (CIDR notation)
+      description: Db tier network block (CIDR notation)
+   policy_name:
+      type: string
+      label: Policy Name (to connect Network 1 and Network 2)
+      description: Policy name to connect Web and Db Tiers
+   policy_direction:
+      type: string
+      label: Policy Direction (< , > , <>)
+      description: Direction to apply policy
+
+resources:
+   net1:
+      type: "OS::Contrail::VirtualNetwork"
+      properties:
+         name: { get_param: vn_1_name } 
+ 
+   net1-subnet1:
+      type: "OS::Neutron::Subnet"
+      properties:
+         cidr: { get_param: vn_1_cidr }
+         name: { get_resource: net1 }
+         enable_dhcp: true
+         network_id: { get_resource: net1 }
+
+   net2:
+      type: "OS::Contrail::VirtualNetwork"
+      properties:
+         name: { get_param: vn_2_name }
+
+   net2-subnet1:
+      type: "OS::Neutron::Subnet"
+      properties:
+         cidr: { get_param: vn_2_cidr }
+         name: { get_resource: net2 }
+         enable_dhcp: true
+         network_id: { get_resource: net2 }
+
+   host1_port0:
+      type: "OS::Neutron::Port"
+      properties:
+         network_id: { get_resource: net1 }
+
+   host2_port0:
+      type: "OS::Neutron::Port"
+      properties:
+         network_id: { get_resource: net2 }
+
+   host1:
+      type: "OS::Nova::Server"
+      properties:
+         name: host1
+         image: ubuntu
+         flavor: m1.medium
+         networks:
+           - port: { get_resource: host1_port0 }
+
+   host2:
+      type: "OS::Nova::Server"
+      properties:
+         name: host2
+         image: ubuntu
+         flavor: m1.medium
+         networks:
+           - port: { get_resource: host2_port0 }
+
+   policy_web_db:
+      type: OS::Contrail::NetworkPolicy
+      properties:
+         name: { get_param: policy_name }
+         entries:
+            policy_rule: [
+               {
+                  "direction": { get_param: policy_direction },
+                  "protocol": "any",
+                  "action_list": { "simple_action": "pass" },
+                  "dst_addresses": [{ "virtual_network": { get_resource: net1 }}],
+                  "src_addresses": [{ "virtual_network": { get_resource: net2 }}],
+                  "src_ports": [{"start_port": "-1" ,  "end_port": "-1" }],
+                  "dst_ports": [{"start_port": "-1" ,  "end_port": "-1" }]
+               }
+            ]
+
+   policy_attach_net1:
+     type: OS::Contrail::AttachPolicy
+     properties:
+        network_id: { get_resource: net1 }
+        policy: { get_attr: [ policy_web_db, fq_name ]}
+
+   policy_attach_net2:
+     type: OS::Contrail::AttachPolicy
+     properties:
+        network_id: { get_resource: net2 }
+        policy: { get_attr: [ policy_web_db, fq_name ]}
