@@ -2,6 +2,7 @@ import ConfigParser
 
 from cfgm_common import exceptions as cfgm_exp
 from heat.engine import resource
+from heat.engine.properties import Properties
 from heat.openstack.common import log as logging
 from vnc_api import vnc_api
 
@@ -64,6 +65,20 @@ class ContrailResource(resource.Resource):
 
     def _show_resource(self):
         return {}
+
+    def prepare_update_properties(self, json_snippet):
+        '''
+        Removes any properties which are not update_allowed, then processes
+        as for prepare_properties.
+        '''
+        p = Properties(self.properties_schema,
+                       json_snippet.get('Properties', {}),
+                       self._resolve_runtime_data,
+                       self.name,
+                       self.context)
+        props = dict((k, v) for k, v in p.items()
+                     if p.props.get(k).schema.update_allowed)
+        return props
 
     def _resolve_attribute(self, name):
         try:
