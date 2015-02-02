@@ -29,6 +29,15 @@ parameters:
   static_routes_list:
     type: string
     description: List of static routes enabled-disabled
+  scaling:
+    type: string
+    description: Indicates whether service scaling is enabled
+  availability_zone:
+    type: string
+    description: Indicates availability zone is enabled
+  ordered_interfaces:
+    type: string
+    description: Indicates service interfaces are ordered
 
 resources:
   service_template:
@@ -38,6 +47,9 @@ resources:
       service_mode: { get_param: mode }
       service_type: { get_param: type }
       image_name: { get_param: image }
+      service_scaling: { get_param: scaling }
+      availability_zone_enable: { get_param: availability_zone }
+      ordered_interfaces: { get_param: ordered_interfaces }
       flavor: { get_param: flavor }
       service_interface_type_list: { "Fn::Split" : [ ",", Ref: service_interface_type_list ] }
       shared_ip_list: { "Fn::Split" : [ ",", Ref: shared_ip_list ] }
