@@ -16,7 +16,7 @@ def requirements(filename):
 
 setup(
     name='contrail_heat',
-    version='0.1dev',
+    version='0.1.dev0',
     packages=find_packages(),
     package_data={'': ['*.env', '*.yaml', '*.xml']},
     zip_safe=False,
