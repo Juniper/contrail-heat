@@ -105,9 +105,6 @@ class HeatServiceTemplate(ContrailResource):
             properties.Schema.STRING,
             _('Indicates service VM flavor'),
             update_allowed=False,
-            constraints=[
-                constraints.AllowedValues(['m1.tiny', 'm1.small', 'm1.medium', 'm1.large', 'm1.xlarge']),
-            ],
             required=True,
         ),
         ORDERED_INTERFACES: properties.Schema(
@@ -167,6 +164,7 @@ class HeatServiceTemplate(ContrailResource):
             svc_properties.set_availability_zone_enable(False)
         svc_properties.set_service_mode(self.properties[self.SERVICE_MODE])
         svc_properties.set_service_type(self.properties[self.SERVICE_TYPE])
+        svc_properties.set_availability_zone_enable(self.properties[self.AVAILABILITY_ZONE_ENABLE])
         svc_properties.set_service_virtualization_type(
             self.properties[self.SERVICE_VIRT_TYPE])
         svc_properties.set_ordered_interfaces(
