@@ -195,6 +195,8 @@ class HeatServiceInstance(ContrailResource):
                                                 auto_scale=auto_scale)
         si_prop.set_scale_out(scale_out)
 
+        si_prop.set_availability_zone(self.properties[self.AVAILABILITY_ZONE])
+
         si_prop.set_ha_mode(self.properties[self.HA_MODE])
         si_obj.set_service_instance_properties(si_prop)
 
