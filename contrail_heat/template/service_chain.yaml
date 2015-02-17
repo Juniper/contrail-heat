@@ -51,6 +51,10 @@ parameters:
     type: string
     default: TestInstance1
     description: service instance name
+  private_availability_zone:
+    type: string
+    default: ""
+    description: availability zone in form of Zone:Host
 
 resources:
   private_net_1:
@@ -91,6 +95,7 @@ resources:
     properties:
       name: { get_param: private_instance_name }
       service_template: { get_param:  private_template}
+      availability_zone: { get_param: private_availability_zone}
       scale_out: 
           max_instances: 1
       interface_list: [
