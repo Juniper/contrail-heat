@@ -101,11 +101,11 @@ resources:
    policy_attach_net1:
      type: OS::Contrail::AttachPolicy
      properties:
-        network_id: { get_resource: net1 }
+        network: { get_resource: net1 }
         policy: { get_attr: [ policy_web_db, fq_name ]}
 
    policy_attach_net2:
      type: OS::Contrail::AttachPolicy
      properties:
-        network_id: { get_resource: net2 }
+        network: { get_resource: net2 }
         policy: { get_attr: [ policy_web_db, fq_name ]}

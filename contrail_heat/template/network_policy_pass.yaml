@@ -108,11 +108,11 @@ resources:
   private_policy_attach_net1:
     type: OS::Contrail::AttachPolicy
     properties:
-      network_id: { get_resource: private_net_1 }
+      network: { get_resource: private_net_1 }
       policy: { get_attr: [private_policy, fq_name] }
 
   private_policy_attach_net2:
     type: OS::Contrail::AttachPolicy
     properties:
-      network_id: { get_resource: private_net_2 }
+      network: { get_resource: private_net_2 }
       policy: { get_attr: [private_policy, fq_name] }

@@ -160,21 +160,29 @@ class NetworkPolicy(ContrailResource):
                 policy_rule['action_list']['apply_service'][
                     index] = si_obj.get_fq_name_str()
 
-    def fix_vn_uuid_to_fqname(self, props):
+    def fix_vn_to_fqname(self, props):
         for policy_rule in props['entries']['policy_rule']:
             for dest_address in policy_rule['dst_addresses']:
-                dest_address['virtual_network'] = ':'.join(
-                    self.vnc_lib().id_to_fq_name(
-                        dest_address['virtual_network']))
+                try:
+                    dest_address['virtual_network'] = ':'.join(
+                        self.vnc_lib().id_to_fq_name(
+                            dest_address['virtual_network']))
+                except Exception:
+                    # the user input is already an fq_name_string
+                    pass
             for src_address in policy_rule['src_addresses']:
-                src_address['virtual_network'] = ':'.join(
-                    self.vnc_lib().id_to_fq_name(
-                        src_address['virtual_network']))
+                try:
+                    src_address['virtual_network'] = ':'.join(
+                        self.vnc_lib().id_to_fq_name(
+                            src_address['virtual_network']))
+                except Exception:
+                    # the user input is already an fq_name_string
+                    pass
 
     def handle_create(self):
         props = {}
         props['entries'] = copy.deepcopy(self.properties['entries'])
-        self.fix_vn_uuid_to_fqname(props)
+        self.fix_vn_to_fqname(props)
         self.fix_apply_service(props)
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
