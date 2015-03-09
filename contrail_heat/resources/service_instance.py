@@ -154,8 +154,12 @@ class HeatServiceInstance(ContrailResource):
         si_obj = vnc_api.ServiceInstance(
             name=self.properties[self.NAME], parent_obj=project_obj)
 
-        si_prop = vnc_api.ServiceInstanceType()
+        svc_tmpl_if_list = st_obj.get_service_template_properties().interface_type
+        svc_inst_if_list = self.properties[self.INTERFACE_LIST]
+        if len(svc_tmpl_if_list) != len(svc_inst_if_list):
+            raise vnc_api.BadRequest
 
+        si_prop = vnc_api.ServiceInstanceType()
         for intf in self.properties[self.INTERFACE_LIST]:
             virt_net = intf[self.VIRTUAL_NETWORK]
             if virt_net == "auto":
@@ -167,39 +171,6 @@ class HeatServiceInstance(ContrailResource):
                 vn_name = virt_net
             if_type = vnc_api.ServiceInstanceInterfaceType(virtual_network=vn_name)
             si_prop.add_interface_list(if_type)
-
-        virt_net = self.properties[self.INTERFACE_LIST][0]['virtual_network']
-        if virt_net != "auto":
-            if not ":" in virt_net:
-                fq_name = self.vnc_lib().id_to_fq_name(virt_net)
-                fq_name_str = ":".join(fq_name)
-            else:
-                fq_name_str = virt_net
-            si_prop.set_management_virtual_network(fq_name_str)
-        else:
-            si_prop.set_management_virtual_network("")
-
-        virt_net = self.properties[self.INTERFACE_LIST][1]['virtual_network']
-        if virt_net != "auto":
-            if not ":" in virt_net:
-                fq_name = self.vnc_lib().id_to_fq_name(virt_net)
-                fq_name_str = ":".join(fq_name)
-            else:
-                fq_name_str = virt_net
-            si_prop.set_left_virtual_network(fq_name_str)
-        else:
-            si_prop.set_left_virtual_network("")
-
-        virt_net = self.properties[self.INTERFACE_LIST][2]['virtual_network']
-        if virt_net != "auto":
-            if not ":" in virt_net:
-                fq_name = self.vnc_lib().id_to_fq_name(virt_net)
-                fq_name_str = ":".join(fq_name)
-            else:
-                fq_name_str = virt_net
-            si_prop.set_right_virtual_network(fq_name_str)
-        else:
-            si_prop.set_right_virtual_network("")
 
         if self.properties[self.SCALE_OUT] is None:
             max_instances = 1
