@@ -11,9 +11,9 @@ LOG = logging.getLogger(__name__)
 
 class ContrailVirtualNetwork(contrail.ContrailResource):
     PROPERTIES = (
-        NAME, ROUTE_TARGETS, SHARED, EXTERNAL
+        NAME, ROUTE_TARGETS, SHARED, EXTERNAL, ALLOW_TRANSIT
     ) = (
-        'name', 'route_targets', 'shared', 'external'
+        'name', 'route_targets', 'shared', 'external', 'allow_transit'
     )
 
     properties_schema = {
@@ -48,14 +48,23 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             ],
             update_allowed=True
         ),
+        ALLOW_TRANSIT: properties.Schema(
+            properties.Schema.STRING,
+            _('Whether this network should be transitive.'),
+            default='False',
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
+            update_allowed=True
+        ),
     }
-
     attributes_schema = {
         "name": _("The name of the Virtual Network."),
         "fq_name": _("The FQ name of the Virtual Network."),
         "route_targets": _("Route Targets list."),
         "shared": _("shared across all tenants."),
         "external": _("external."),
+        "allow_transit": _("allow_transit."),
         "show": _("All attributes."),
     }
 
@@ -67,6 +76,10 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         vn_obj = vnc_api.VirtualNetwork(name=self.properties[self.NAME],
                                         parent_obj=project_obj)
         vn_params = vnc_api.VirtualNetworkType()
+        if self.properties[self.ALLOW_TRANSIT] == "True":
+            vn_params.set_allow_transit(True)
+        else:
+            vn_params.set_allow_transit(False)
         vn_params.set_forwarding_mode('l2_l3')
         vn_obj.set_virtual_network_properties(vn_params)
         vn_obj.set_route_target_list(vnc_api.RouteTargetList(
@@ -91,7 +104,12 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             raise ex
 
         props = self.prepare_update_properties(json_snippet)
-
+        vn_params = vnc_api.VirtualNetworkType()
+        if props[self.ALLOW_TRANSIT] == "True":
+            vn_params.set_allow_transit(True)
+        else:
+            vn_params.set_allow_transit(False)
+        vn_obj.set_virtual_network_properties(vn_params)
         vn_obj.set_route_target_list(vnc_api.RouteTargetList(
             ["target:" + route for route in props[
                 self.ROUTE_TARGETS]]))
