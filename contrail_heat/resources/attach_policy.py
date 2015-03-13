@@ -3,6 +3,7 @@ from heat.engine.resources.neutron import neutron
 from heat.engine import properties
 
 from neutronclient.common.exceptions import NeutronClientException
+from neutronclient.neutron import v2_0 as neutronV20
 from heat.openstack.common import log as logging
 
 logger = logging.getLogger(__name__)
@@ -11,15 +12,15 @@ logger = logging.getLogger(__name__)
 class AttachPolicy(neutron.NeutronResource):
 
     PROPERTIES = (
-        NETWORK_ID, POLICY,
+        NETWORK, POLICY,
     ) = (
-        'network_id', 'policy',
+        'network', 'policy',
     )
 
     properties_schema = {
-        NETWORK_ID: properties.Schema(
+        NETWORK: properties.Schema(
             properties.Schema.STRING,
-            description=_('The network id'),
+            description=_('The network id or fq_name_string'),
             required=True),
         POLICY: properties.Schema(
             properties.Schema.STRING,
@@ -28,7 +29,13 @@ class AttachPolicy(neutron.NeutronResource):
     }
 
     def handle_create(self):
-        network_id = self.properties.get(self.NETWORK_ID)
+        if not ":" in self.properties.get(self.NETWORK):
+            network = self.properties.get(self.NETWORK)
+        else:
+            network = self.properties.get(self.NETWORK).split(":")[2]
+        network_id = neutronV20.find_resourceid_by_name_or_id(
+            self.neutron(), 'network', network)
+
         policies = self.neutron().show_network(network_id).get('network').get('contrail:policys')
         if not policies:
             policies = []

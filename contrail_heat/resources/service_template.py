@@ -65,10 +65,13 @@ class HeatServiceTemplate(ContrailResource):
             required=True,
         ),
         SERVICE_SCALING: properties.Schema(
-            properties.Schema.BOOLEAN,
+            properties.Schema.STRING,
             _('Indicates whether service scaling is enabled'),
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
             update_allowed=False,
-            default=False,
+            default='False',
         ),
         SERVICE_INTERFACE_TYPE_LIST: properties.Schema(
             properties.Schema.LIST,
@@ -105,9 +108,12 @@ class HeatServiceTemplate(ContrailResource):
             required=True,
         ),
         ORDERED_INTERFACES: properties.Schema(
-            properties.Schema.BOOLEAN,
+            properties.Schema.STRING,
             _('Indicates service interfaces are ordered'),
-            default=False,
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
+            default='False',
             update_allowed=False
         ),
         SERVICE_VIRT_TYPE: properties.Schema(
@@ -121,9 +127,11 @@ class HeatServiceTemplate(ContrailResource):
             update_allowed=False
         ),
         AVAILABILITY_ZONE_ENABLE: properties.Schema(
-            properties.Schema.BOOLEAN,
+            properties.Schema.STRING,
             _('Indicates availability zone is enabled'),
-            default=False,
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
             update_allowed=False
         )
     }
@@ -146,10 +154,17 @@ class HeatServiceTemplate(ContrailResource):
         svc_properties = vnc_api.ServiceTemplateType()
         svc_properties.set_image_name(self.properties[self.IMAGE_NAME])
         svc_properties.set_flavor(self.properties[self.FLAVOR])
-        svc_properties.set_service_scaling(
-            self.properties[self.SERVICE_SCALING])
+        if self.properties[self.SERVICE_SCALING] == 'True':
+            svc_properties.set_service_scaling(True)
+        else:
+            svc_properties.set_service_scaling(False)
+        if self.properties[self.AVAILABILITY_ZONE_ENABLE] == 'True':
+            svc_properties.set_availability_zone_enable(True)
+        else:
+            svc_properties.set_availability_zone_enable(False)
         svc_properties.set_service_mode(self.properties[self.SERVICE_MODE])
         svc_properties.set_service_type(self.properties[self.SERVICE_TYPE])
+        svc_properties.set_availability_zone_enable(self.properties[self.AVAILABILITY_ZONE_ENABLE])
         svc_properties.set_service_virtualization_type(
             self.properties[self.SERVICE_VIRT_TYPE])
         svc_properties.set_ordered_interfaces(

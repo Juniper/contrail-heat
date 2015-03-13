@@ -1,0 +1,27 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to creates a virtual network
+
+parameters:
+  net_name:
+    type: string
+    description: Name of virtual network to be created
+  shared:
+    type: string
+    description: Is virtual network shared
+  external:
+    type: string
+    description: Is virtual network external
+  route_targets:
+    type: string
+    description: route targets associated with the virtual network
+
+resources:
+  private_net:
+    type: OS::Contrail::VirtualNetwork
+    properties:
+      name: { get_param: net_name }
+      shared: { get_param: shared }
+      external: { get_param: external }
+      route_targets: { "Fn::Split" : [ ",", Ref: route_targets ] }

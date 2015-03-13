@@ -1,0 +1,43 @@
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to launch an analyzer using the "analyzer-template"
+   by calling a service_instance for an existing virtual network
+
+parameters:
+  private_net_1_name:
+    type: string
+    description: Name of private network to be used
+  private_template:
+    type: string
+    default: TestTemplate1
+    description: service template name or ID
+  private_instance_name:
+    type: string
+    default: TestInstance1
+    description: service instance name
+
+resources:
+  service_instance:
+    type: OS::Contrail::ServiceInstance
+    properties:
+      name: { get_param: private_instance_name }
+      service_template: { get_param: private_template }
+      scale_out:
+          max_instances: 1
+      interface_list: [
+          {
+          virtual_network: { get_param: private_net_1_name }
+          },
+      ]
+
+outputs:
+  service_instance_fq_name:
+    description: FQ name of the service template
+    value: { get_attr: [ service_instance, fq_name] }
+  service_instance_vms:
+    description: List of service VMs
+    value: { get_attr: [ service_instance, virtual_machines] }
+  num_active_service_instance_vms:
+    description: Number of active service VMs
+    value: { get_attr: [ service_instance, active_service_vms] }
