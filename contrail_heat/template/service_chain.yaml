@@ -67,6 +67,9 @@ parameters:
     type: string
     default: ""
     description: availability zone in form of Zone:Host
+  max_instances:
+    type: number
+    description: maximum number of instances to be spawned
 
 resources:
   private_net_1:
@@ -109,7 +112,7 @@ resources:
       service_template: { get_param:  private_template}
       availability_zone: { get_param: private_availability_zone}
       scale_out: 
-          max_instances: 1
+          max_instances: { get_param: max_instances }
       interface_list: [
           {
               virtual_network: "auto"
