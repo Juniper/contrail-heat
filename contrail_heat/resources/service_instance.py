@@ -103,7 +103,7 @@ class HeatServiceInstance(ContrailResource):
         SCALE_OUT: properties.Schema(
             properties.Schema.MAP,
             _('Scale out property'),
-            update_allowed=False,
+            update_allowed=True,
             schema={
                 MAX_INSTANCES: properties.Schema(
                     properties.Schema.INTEGER,
@@ -193,6 +193,35 @@ class HeatServiceInstance(ContrailResource):
         si_uuid = self.vnc_lib().service_instance_create(si_obj)
         self.resource_id_set(si_uuid)
 
+    def handle_update(self, json_snippet, tmpl_diff, prop_diff):
+        try:
+            si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
+        except Exception as ex:
+            LOG.warn(_("Service Instance %s not found.") % self.name)
+            raise ex
+
+        props = self.prepare_update_properties(json_snippet)
+
+        si_prop = si_obj.get_service_instance_properties()
+        if props[self.SCALE_OUT] is None:
+            max_instances = 1
+            auto_scale = False
+        else:
+            max_instances = props[self.SCALE_OUT][self.MAX_INSTANCES]
+            auto_scale = props[self.SCALE_OUT][self.AUTO_SCALE]
+        scale_out = vnc_api.ServiceScaleOutType(max_instances=max_instances,
+                                                auto_scale=auto_scale)
+        si_prop.set_scale_out(scale_out)
+
+        si_obj.set_service_instance_properties(si_prop)
+        self.vnc_lib().service_instance_update(si_obj)
+
+    def handle_delete(self):
+        try:
+            self.vnc_lib().service_instance_delete(id=self.resource_id)
+        except Exception:
+            pass
+
     def _show_resource(self):
         si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
         dict = {}
@@ -224,16 +253,6 @@ class HeatServiceInstance(ContrailResource):
         dict['service_template'] = ':'.join(
             si_obj.get_service_template_refs()[0]['to'])
         return dict
-
-    def handle_delete(self):
-        try:
-            self.vnc_lib().service_instance_delete(id=self.resource_id)
-        except Exception:
-            pass
-
-    def handle_update(self, json_snippet, tmpl_diff, prop_diff):
-        # TODO
-        pass
 
 
 def resource_mapping():
