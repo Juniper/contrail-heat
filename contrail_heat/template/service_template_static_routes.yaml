@@ -1,0 +1,61 @@
+
+heat_template_version: 2013-05-23
+
+description: >
+  HOT template to create a service template 
+
+parameters:
+  name:
+    type: string
+    description: Name of service template
+  mode:
+    type: string
+    description: service mode
+  type:
+    type: string
+    description: service type
+  image:
+    type: string
+    description: Name of the image
+  flavor:
+    type: string
+    description: Flavor
+  service_interface_type_list:
+    type: string
+    description: List of interface types
+  shared_ip_list:
+    type: string
+    description: List of shared ip enabled-disabled
+  static_routes_list:
+    type: string
+    description: List of static routes enabled-disabled
+  scaling:
+    type: string
+    description: Indicates whether service scaling is enabled
+  availability_zone:
+    type: string
+    description: Indicates availability zone is enabled
+  ordered_interfaces:
+    type: string
+    description: Indicates service interfaces are ordered
+
+resources:
+  service_template:
+    type: OS::Contrail::ServiceTemplate
+    properties:
+      name: { get_param: name }
+      service_mode: { get_param: mode }
+      service_type: { get_param: type }
+      image_name: { get_param: image }
+      service_scaling: { get_param: scaling }
+      availability_zone_enable: { get_param: availability_zone }
+      ordered_interfaces: { get_param: ordered_interfaces }
+      flavor: { get_param: flavor }
+      service_interface_type_list: { "Fn::Split" : [ ",", Ref: service_interface_type_list ] }
+      shared_ip_list: { "Fn::Split" : [ ",", Ref: shared_ip_list ] }
+      static_routes_list: { "Fn::Split" : [ ",", Ref: static_routes_list ] }
+
+outputs:
+  service_template_fq_name:
+    description: FQ name of the service template
+    value: { get_attr: [ service_template, fq_name] }
