@@ -159,6 +159,7 @@ class HeatServiceInstance(ContrailResource):
         if len(svc_tmpl_if_list) != len(svc_inst_if_list):
             raise vnc_api.BadRequest
 
+        if_index = 0
         si_prop = vnc_api.ServiceInstanceType()
         for intf in self.properties[self.INTERFACE_LIST]:
             virt_net = intf[self.VIRTUAL_NETWORK]
@@ -169,8 +170,17 @@ class HeatServiceInstance(ContrailResource):
                 vn_name = ":".join(fq_name)
             else:
                 vn_name = virt_net
-            if_type = vnc_api.ServiceInstanceInterfaceType(virtual_network=vn_name)
+
+            # now check for static routes on this interface
+            routes_list = {}
+            if svc_tmpl_if_list[if_index].get_static_route_enable(
+                ) and self.STATIC_ROUTES in intf:
+                routes_list['route'] = intf[self.STATIC_ROUTES]
+
+            if_type = vnc_api.ServiceInstanceInterfaceType(
+                virtual_network=vn_name,static_routes=routes_list or None)
             si_prop.add_interface_list(if_type)
+            if_index = if_index + 1
 
         if self.properties[self.SCALE_OUT] is None:
             max_instances = 1
