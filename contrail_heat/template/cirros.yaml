@@ -1,0 +1,15 @@
+heat_template_version: 2013-05-23
+description: A simple server.
+resources:
+  server:
+    type: "OS::Nova::Server"
+    properties:
+      name: host1
+      image: 'Cirros 0.3.3'
+      flavor: m1.nano
+      networks:
+        - network: internal001
+      user_data_format: RAW
+      user_data: |
+        #!/bin/sh
+        while [ 1 ] ; do echo $((13**99)) 1>/dev/null 2>&1; done
