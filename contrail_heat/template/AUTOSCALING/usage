@@ -1,0 +1,1 @@
+heat stack-create simple -f simple.yaml -e environment.yaml
