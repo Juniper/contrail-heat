@@ -16,6 +16,9 @@ parameters:
   route_targets:
     type: string
     description: route targets associated with the virtual network
+  forwarding_mode:
+    type: string
+    description: forwarding mode of the virtual network
 
 resources:
   private_net:
@@ -25,3 +28,4 @@ resources:
       shared: { get_param: shared }
       external: { get_param: external }
       route_targets: { "Fn::Split" : [ ",", Ref: route_targets ] }
+      forwarding_mode: { get_param: forwarding_mode }
