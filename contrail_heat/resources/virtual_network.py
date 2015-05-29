@@ -11,9 +11,11 @@ LOG = logging.getLogger(__name__)
 
 class ContrailVirtualNetwork(contrail.ContrailResource):
     PROPERTIES = (
-        NAME, ROUTE_TARGETS, SHARED, EXTERNAL, ALLOW_TRANSIT
+        NAME, ROUTE_TARGETS, SHARED, EXTERNAL, ALLOW_TRANSIT,
+        FORWARDING_MODE
     ) = (
-        'name', 'route_targets', 'shared', 'external', 'allow_transit'
+        'name', 'route_targets', 'shared', 'external', 'allow_transit',
+        'forwarding_mode'
     )
 
     properties_schema = {
@@ -57,6 +59,15 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             ],
             update_allowed=True
         ),
+        FORWARDING_MODE: properties.Schema(
+            properties.Schema.STRING,
+            _('Forwarding mode of this network.'),
+            default='l2_l3',
+            constraints=[
+                constraints.AllowedValues(['l2_l3', 'l2']),
+            ],
+            update_allowed=True
+        ),
     }
     attributes_schema = {
         "name": _("The name of the Virtual Network."),
@@ -65,6 +76,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         "shared": _("shared across all tenants."),
         "external": _("external."),
         "allow_transit": _("allow_transit."),
+        "forwarding_mode": _("forwarding_mode."),
         "show": _("All attributes."),
     }
 
@@ -80,7 +92,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             vn_params.set_allow_transit(True)
         else:
             vn_params.set_allow_transit(False)
-        vn_params.set_forwarding_mode('l2_l3')
+        vn_params.set_forwarding_mode(self.properties[self.FORWARDING_MODE])
         vn_obj.set_virtual_network_properties(vn_params)
         vn_obj.set_route_target_list(vnc_api.RouteTargetList(
             ["target:" + route for route in self.properties[
@@ -109,6 +121,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             vn_params.set_allow_transit(True)
         else:
             vn_params.set_allow_transit(False)
+        vn_params.set_forwarding_mode(props[self.FORWARDING_MODE])
         vn_obj.set_virtual_network_properties(vn_params)
         vn_obj.set_route_target_list(vnc_api.RouteTargetList(
             ["target:" + route for route in props[

@@ -5,7 +5,7 @@ from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 import uuid
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class HeatServiceInstance(ContrailResource):
