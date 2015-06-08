@@ -156,12 +156,17 @@ class HeatVnSubnet(contrail.ContrailResource):
         return ipam_obj
 
     def _update_subnet(self, subnet, props):
-        if props[self.ENABLE_DHCP] == "True":
+        import pdb; pdb.set_trace()
+        if props.get(self.ENABLE_DHCP) == "True":
             subnet.set_enable_dhcp(True)
         else:
             subnet.set_enable_dhcp(False)
-        subnet.set_dns_nameservers(props[self.DNS_NAMESERVERS])
-        subnet.set_host_routes(props[self.HOST_ROUTES])
+        dns_servers = props.get(self.DNS_NAMESERVERS)
+        if dns_servers:
+            subnet.set_dns_nameservers(dns_servers)
+        host_routes = props.get(self.HOST_ROUTES)
+        if host_routes:
+            subnet.set_host_routes(host_routes)
 
     def handle_create(self):
         try:
@@ -205,14 +210,12 @@ class HeatVnSubnet(contrail.ContrailResource):
             vn_obj = self.vnc_lib().virtual_network_read(
                 fq_name_str=self.properties[self.NETWORK])
 
-        props = self.prepare_update_properties(json_snippet)
-
         ipam = self._get_ipam()
         subnets = self._get_subnets(vn_obj, ipam)
         for subnet in subnets:
             if (subnet.get_subnet_uuid() and
                     subnet.get_subnet_uuid() == str(uuid.UUID(subnet_uuid))):
-                self._update_subnet(subnet, props)
+                self._update_subnet(subnet, prop_diff)
                 vn_obj._pending_field_updates.add('network_ipam_refs')
                 break
         self.vnc_lib().virtual_network_update(vn_obj)

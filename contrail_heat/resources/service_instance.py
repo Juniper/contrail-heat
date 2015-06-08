@@ -213,15 +213,12 @@ class HeatServiceInstance(ContrailResource):
             LOG.warn(_("Unknown error."))
             raise
 
-        props = self.prepare_update_properties(json_snippet)
-
         si_prop = si_obj.get_service_instance_properties()
-        if props[self.SCALE_OUT] is None:
-            max_instances = 1
-            auto_scale = False
-        else:
-            max_instances = props[self.SCALE_OUT][self.MAX_INSTANCES]
-            auto_scale = props[self.SCALE_OUT][self.AUTO_SCALE]
+
+        scaleprop = prop_diff.get(self.SCALE_OUT)
+        if scaleprop:
+            max_instances = scaleprop.get(self.MAX_INSTANCES)
+            auto_scale = scaleprop.get(self.AUTO_SCALE)
         scale_out = vnc_api.ServiceScaleOutType(max_instances=max_instances,
                                                 auto_scale=auto_scale)
         si_prop.set_scale_out(scale_out)

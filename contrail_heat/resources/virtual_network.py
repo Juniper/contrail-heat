@@ -115,25 +115,33 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             LOG.warn(_("Virtual Network %s not found.") % self.name)
             raise ex
 
-        props = self.prepare_update_properties(json_snippet)
         vn_params = vnc_api.VirtualNetworkType()
-        if props[self.ALLOW_TRANSIT] == "True":
+
+        if prop_diff.get(self.ALLOW_TRANSIT) == "True":
             vn_params.set_allow_transit(True)
         else:
             vn_params.set_allow_transit(False)
-        vn_params.set_forwarding_mode(props[self.FORWARDING_MODE])
-        vn_obj.set_virtual_network_properties(vn_params)
-        vn_obj.set_route_target_list(vnc_api.RouteTargetList(
-            ["target:" + route for route in props[
-                self.ROUTE_TARGETS]]))
-        if props[self.SHARED] == "True":
+
+        if prop_diff.get(self.SHARED) == "True":
             vn_obj.set_is_shared(True)
         else:
             vn_obj.set_is_shared(False)
-        if props[self.EXTERNAL] == "True":
+
+        if prop_diff.get(self.EXTERNAL) == "True":
             vn_obj.set_router_external(True)
         else:
             vn_obj.set_router_external(False)
+
+        fwd_mode = prop_diff.get(self.FORWARDING_MODE)
+        if fwd_mode:
+            vn_params.set_forwarding_mode(fwd_mode)
+
+        vn_obj.set_virtual_network_properties(vn_params)
+
+        rt_list = prop_diff.get(self.ROUTE_TARGETS)
+        if rt_list:
+            vn_obj.set_route_target_list(vnc_api.RouteTargetList(
+                ["target:" + route for route in rt_list]))
         self.vnc_lib().virtual_network_update(vn_obj)
 
     def _show_resource(self):
