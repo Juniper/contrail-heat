@@ -156,7 +156,6 @@ class HeatVnSubnet(contrail.ContrailResource):
         return ipam_obj
 
     def _update_subnet(self, subnet, props):
-        import pdb; pdb.set_trace()
         if props.get(self.ENABLE_DHCP) == "True":
             subnet.set_enable_dhcp(True)
         else:
