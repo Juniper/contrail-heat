@@ -1,0 +1,8 @@
+Verified+2: Zuul <zuul@lists.opencontrail.org>
+Code-Review+2: ted ghose <rintu@hotmail.com>
+Approved+1: Ashish Ranjan <aranjan@juniper.net>
+Submitted-by: Zuul <zuul@lists.opencontrail.org>
+Submitted-at: Tue, 25 Aug 2015 16:45:53 -0700
+Reviewed-on: https://review.opencontrail.org/12680
+Project: Juniper/contrail-heat
+Branch: refs/heads/R2.20
