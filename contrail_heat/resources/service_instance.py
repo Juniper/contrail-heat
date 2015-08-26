@@ -249,6 +249,8 @@ class HeatServiceInstance(ContrailResource):
         dict['virtual_machines'] = svms
         if inactive_count and active_count:
             status = "PARTIALLY ACTIVE"
+        elif active_count == 0:
+            status = "INACTIVE"
         elif active_count == len(si_obj.get_virtual_machine_back_refs() or []):
             status = "ACTIVE"
         dict['status'] = status
