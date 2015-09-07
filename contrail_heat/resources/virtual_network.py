@@ -1,9 +1,16 @@
 import uuid
 
 from contrail_heat.resources import contrail
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
 from heat.engine import constraints
 from heat.engine import properties
-from heat.openstack.common import log as logging
+try:
+    from heat.openstack.common import log as logging
+except ImportError:
+    from oslo_log import log as logging
 from vnc_api import vnc_api
 
 LOG = logging.getLogger(__name__)

@@ -1,10 +1,18 @@
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
+
 from heat.engine import constraints
 from heat.engine import clients
 from heat.engine import properties
 from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 
-from heat.openstack.common import log as logging
+try:
+    from heat.openstack.common import log as logging
+except ImportError:
+    from oslo_log import log as logging
 import uuid
 import copy
 

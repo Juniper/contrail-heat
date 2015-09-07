@@ -1,10 +1,17 @@
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
 from heat.common import exception
 from heat.engine import properties
 
 from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 
-from heat.openstack.common import log as logging
+try:
+    from heat.openstack.common import log as logging
+except ImportError:
+    from oslo_log import log as logging
 
 logger = logging.getLogger(__name__)
 

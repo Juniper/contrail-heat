@@ -1,3 +1,7 @@
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
 from heat.engine import properties
 from heat.engine import constraints
 from vnc_api import vnc_api

@@ -1,8 +1,15 @@
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
 from heat.engine import constraints
 from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
+try:
+    from heat.openstack.common import log as logging
+except ImportError:
+    from oslo_log import log as logging
 from heat.engine import scheduler
-from heat.openstack.common import log as logging
 from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 import uuid
