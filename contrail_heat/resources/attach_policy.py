@@ -1,10 +1,20 @@
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
 from heat.common import exception
-from heat.engine.resources.neutron import neutron
+try:
+    from heat.engine.resources.neutron import neutron
+except ImportError:
+    from heat.engine.resources.openstack.neutron import neutron
 from heat.engine import properties
 
 from neutronclient.common.exceptions import NeutronClientException
 from neutronclient.neutron import v2_0 as neutronV20
-from heat.openstack.common import log as logging
+try:
+    from heat.openstack.common import log as logging
+except ImportError:
+    from oslo_log import log as logging
 
 logger = logging.getLogger(__name__)
 

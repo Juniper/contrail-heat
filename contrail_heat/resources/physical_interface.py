@@ -1,3 +1,8 @@
+try:
+    from heat.common.i18n import _
+except ImportError:
+    pass
+
 from heat.engine import properties
 from vnc_api import vnc_api
 from contrail_heat.resources import contrail
