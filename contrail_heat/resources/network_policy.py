@@ -129,6 +129,19 @@ class NetworkPolicy(ContrailResource):
                                 properties.Schema.LIST,
                                 _('Apply service'),
                             ),
+                            "mirror_to": properties.Schema(
+                                properties.Schema.MAP,
+                                schema={
+                                    "analyzer_name": properties.Schema(
+                                        properties.Schema.STRING,
+                                        _('Service instance')
+                                    ),
+                                    "udp_port": properties.Schema(
+                                        properties.Schema.INTEGER,
+                                        _('upd port')
+                                    )
+                                }
+                            )
                         }
                     ),
                 }
@@ -156,17 +169,30 @@ class NetworkPolicy(ContrailResource):
         "show": _("All attributes."),
     }
 
+    def get_service_instance(self, service):
+        try:
+            si_obj = self.vnc_lib().service_instance_read(id=service)
+        except:
+            si_obj = self.vnc_lib().service_instance_read(
+                fq_name_str=service)
+
+        return si_obj
+
     def fix_apply_service(self, props):
         for policy_rule in props['entries']['policy_rule']:
             for index, service in enumerate(
                     policy_rule['action_list']['apply_service'] or []):
-                try:
-                    si_obj = self.vnc_lib().service_instance_read(id=service)
-                except:
-                    si_obj = self.vnc_lib().service_instance_read(
-                        fq_name_str=service)
+                si_obj = self.get_service_instance(service)
                 policy_rule['action_list']['apply_service'][
                     index] = si_obj.get_fq_name_str()
+
+    def fix_mirror_to(self, props):
+        for policy_rule in props['entries']['policy_rule']:
+            if 'mirror_to' in policy_rule['action_list']:
+                mirror_to = policy_rule['action_list']['mirror_to']
+                service = mirror_to['analyzer_name']
+                si_obj = self.get_service_instance(service)
+                mirror_to['analyzer_name'] = si_obj.get_fq_name_str()
 
     def fix_vn_to_fqname(self, props):
         for policy_rule in props['entries']['policy_rule']:
@@ -192,6 +218,7 @@ class NetworkPolicy(ContrailResource):
         props['entries'] = copy.deepcopy(self.properties['entries'])
         self.fix_vn_to_fqname(props)
         self.fix_apply_service(props)
+        self.fix_mirror_to(props)
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
         np_obj = vnc_api.NetworkPolicy(name=self.properties[self.NAME],
@@ -220,7 +247,8 @@ class NetworkPolicy(ContrailResource):
                 a_list = rule.get_action_list()
                 policy_rule['action_list'] = {
                     'simple_action': a_list.get_simple_action(),
-                    'apply_service': a_list.get_apply_service()
+                    'apply_service': a_list.get_apply_service(),
+                    'mirror_to': a_list.get_mirror_to()
                 }
                 policy_rule['dst_ports'] = rule.get_dst_ports()
                 policy_rule['application'] = rule.get_application()
