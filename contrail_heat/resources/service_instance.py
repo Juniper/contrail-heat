@@ -3,11 +3,14 @@ try:
 except ImportError:
     pass
 from heat.engine import constraints
+from heat.engine import clients
 from heat.engine import properties
 try:
     from heat.openstack.common import log as logging
 except ImportError:
     from oslo_log import log as logging
+from heat.engine import scheduler
+from heat.openstack.common import log as logging
 from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 import uuid
@@ -233,9 +236,60 @@ class HeatServiceInstance(ContrailResource):
         si_obj.set_service_instance_properties(si_prop)
         self.vnc_lib().service_instance_update(si_obj)
 
+    def get_vm(self, vm):
+        '''
+        Refresh vm's attributes and log warnings for non-critical API errors.
+        '''
+        try:
+            vm.get()
+        except clients.novaclient.exceptions.OverLimit as exc:
+            msg = _("Server %(name)s (%(id)s) received an OverLimit "
+                    "response during vm.get(): %(exception)s")
+            logger.warning(msg % {'name': vm.name,
+                                  'id': vm.id,
+                                  'exception': str(exc)})
+        except clients.novaclient.exceptions.ClientException as exc:
+            if ((getattr(exc, 'http_status', getattr(exc, 'code', None)) in
+                 (500, 503))):
+                msg = _('Server "%(name)s" (%(id)s) received the following '
+                        'exception during vm.get(): %(exception)s')
+                logger.warning(msg % {'name': vm.name,
+                                      'id': vm.id,
+                                      'exception': str(exc)})
+            else:
+                raise
+
+    def delete_vm(self, vm):
+        '''
+        Return a routine that deletes the vm and waits for it to
+        disappear from Nova.
+        '''
+
+        while True:
+            yield
+
+            try:
+                self.get_vm(vm)
+            except clients.novaclient.exceptions.NotFound:
+                break
+
     def handle_delete(self):
         try:
+            # get the servers list
+            si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
+            vm_uuid_list = list(si_obj.get_virtual_machine_back_refs() or [])
+
             self.vnc_lib().service_instance_delete(id=self.resource_id)
+
+            for vm_uuid in vm_uuid_list or []:
+                try:
+                    vm = self.nova().servers.get(vm_uuid['to'][0])
+                except clients.novaclient.exceptions.NotFound:
+                    pass
+                else:
+                    delete = scheduler.TaskRunner(self.delete_vm, vm)
+                    delete(wait_time=1.0)
+
         except vnc_api.NoIdError:
             LOG.warn(_("Service Instance %s not found.") % self.name)
         except:
