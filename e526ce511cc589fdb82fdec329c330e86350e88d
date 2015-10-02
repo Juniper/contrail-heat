@@ -1,0 +1,9 @@
+Approved+1: opencontrail-admin <ci-admin@opencontrail.org>
+Code-Review+2: opencontrail-admin <ci-admin@opencontrail.org>
+Verified+2: opencontrail-admin <ci-admin@opencontrail.org>
+Verified+2: Zuul <zuul@lists.opencontrail.org>
+Submitted-by: Zuul <zuul@lists.opencontrail.org>
+Submitted-at: Fri, 02 Oct 2015 05:49:31 -0700
+Reviewed-on: https://review.opencontrail.org/14188
+Project: Juniper/contrail-heat
+Branch: refs/heads/R2.20.x
