@@ -17,6 +17,7 @@ class NetworkPolicy(ContrailResource):
     ) = (
         'name', 'entries',
     )
+
     _rule_schema = {
         "policy_rule": properties.Schema(
             properties.Schema.LIST,
@@ -110,22 +111,26 @@ class NetworkPolicy(ContrailResource):
                     "action_list": properties.Schema(
                         properties.Schema.MAP,
                         _('Array of src addresses to match'),
+                        update_allowed=True,
                         required=True,
                         schema={
                             "simple_action": properties.Schema(
                                 properties.Schema.STRING,
                                 _('Simple Action'),
+                                update_allowed=True,
                                 default='pass'
                             ),
                             "apply_service": properties.Schema(
                                 properties.Schema.LIST,
                                 _('Apply service'),
+                                update_allowed=True,
                             ),
                         }
                     ),
                 }
             ),
             required=True,
+            update_allowed=True,
         ),
     }
     properties_schema = {
@@ -137,7 +142,9 @@ class NetworkPolicy(ContrailResource):
         ENTRIES: properties.Schema(
             properties.Schema.MAP,
             _('Policy entries'),
-            schema=_rule_schema
+            schema=_rule_schema,
+            update_allowed=True,
+            required=True
         )
     }
     attributes_schema = {
@@ -179,6 +186,8 @@ class NetworkPolicy(ContrailResource):
                     # the user input is already an fq_name_string
                     pass
 
+    update_allowed_keys = ('Properties',)
+
     def handle_create(self):
         props = {}
         props['entries'] = copy.deepcopy(self.properties['entries'])
@@ -192,6 +201,25 @@ class NetworkPolicy(ContrailResource):
             vnc_api.PolicyEntriesType.factory(**props['entries']))
         np_uuid = self.vnc_lib().network_policy_create(np_obj)
         self.resource_id_set(np_uuid)
+
+    def handle_update(self, json_snippet, tmpl_diff, prop_diff):
+        props = {}
+        props['entries'] = copy.deepcopy(prop_diff['entries'])
+        self.fix_vn_to_fqname(props)
+        self.fix_apply_service(props)
+
+        try:
+            np_obj = self.vnc_lib().network_policy_read(id=self.resource_id)
+        except vnc_api.NoIdError:
+            LOG.warn(_("Network Policy %s not found.") % self.name)
+            raise
+        except:
+            LOG.warn(_("Unknown error."))
+            raise
+
+        np_obj.set_network_policy_entries(
+            vnc_api.PolicyEntriesType.factory(**props['entries']))
+        self.vnc_lib().network_policy_update(np_obj)
 
     def _show_resource(self):
         np_obj = self.vnc_lib().network_policy_read(id=self.resource_id)
