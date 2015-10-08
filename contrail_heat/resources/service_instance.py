@@ -3,7 +3,7 @@ try:
 except ImportError:
     pass
 from heat.engine import constraints
-from heat.engine import clients
+from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
 try:
     from heat.openstack.common import log as logging
@@ -242,13 +242,13 @@ class HeatServiceInstance(ContrailResource):
         '''
         try:
             vm.get()
-        except clients.novaclient.exceptions.OverLimit as exc:
+        except nova_exceptions.OverLimit as exc:
             msg = _("Server %(name)s (%(id)s) received an OverLimit "
                     "response during vm.get(): %(exception)s")
             logger.warning(msg % {'name': vm.name,
                                   'id': vm.id,
                                   'exception': str(exc)})
-        except clients.novaclient.exceptions.ClientException as exc:
+        except nova_exceptions.ClientException as exc:
             if ((getattr(exc, 'http_status', getattr(exc, 'code', None)) in
                  (500, 503))):
                 msg = _('Server "%(name)s" (%(id)s) received the following '
@@ -270,7 +270,7 @@ class HeatServiceInstance(ContrailResource):
 
             try:
                 self.get_vm(vm)
-            except clients.novaclient.exceptions.NotFound:
+            except nova_exceptions.NotFound:
                 break
 
     def handle_delete(self):
@@ -284,7 +284,7 @@ class HeatServiceInstance(ContrailResource):
             for vm_uuid in vm_uuid_list or []:
                 try:
                     vm = self.nova().servers.get(vm_uuid['to'][0])
-                except clients.novaclient.exceptions.NotFound:
+                except nova_exceptions.NotFound:
                     pass
                 else:
                     delete = scheduler.TaskRunner(self.delete_vm, vm)
