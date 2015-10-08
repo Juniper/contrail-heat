@@ -86,7 +86,6 @@ class HeatServiceTemplate(ContrailResource):
         SHARED_IP_LIST: properties.Schema(
             properties.Schema.LIST,
             _('An ordered list of shared ip enabled for each interface'),
-            required=True,
             constraints=[
                 constraints.AllowedValues(['True', 'False']),
             ],
@@ -95,7 +94,6 @@ class HeatServiceTemplate(ContrailResource):
         STATIC_ROUTES_LIST: properties.Schema(
             properties.Schema.LIST,
             _('An ordered list of static routes enabled for each interface'),
-            required=True,
             constraints=[
                 constraints.AllowedValues(['True', 'False']),
             ],
@@ -105,7 +103,6 @@ class HeatServiceTemplate(ContrailResource):
             properties.Schema.STRING,
             _('Indicates service VM flavor'),
             update_allowed=False,
-            required=True,
         ),
         ORDERED_INTERFACES: properties.Schema(
             properties.Schema.STRING,
@@ -179,7 +176,7 @@ class HeatServiceTemplate(ContrailResource):
                     shared_ip_val = True
                 else:
                     shared_ip_val = False
-            except IndexError:
+            except (IndexError, TypeError):
                 shared_ip_val = False
             try:
                 static_route = self.properties[self.STATIC_ROUTES_LIST][index]
@@ -187,7 +184,7 @@ class HeatServiceTemplate(ContrailResource):
                     static_route_val = True
                 else:
                     static_route_val = False
-            except IndexError:
+            except (IndexError, TypeError):
                 static_route_val = False
             if_type = vnc_api.ServiceTemplateInterfaceType(shared_ip=shared_ip_val)
             if_type.set_service_interface_type(itf)
