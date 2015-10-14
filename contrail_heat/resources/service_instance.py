@@ -10,7 +10,6 @@ try:
 except ImportError:
     from oslo_log import log as logging
 from heat.engine import scheduler
-from heat.openstack.common import log as logging
 from vnc_api import vnc_api
 from contrail_heat.resources.contrail import ContrailResource
 import uuid
