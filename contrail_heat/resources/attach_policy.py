@@ -3,14 +3,11 @@ try:
 except ImportError:
     pass
 from heat.common import exception
-try:
-    from heat.engine.resources.neutron import neutron
-except ImportError:
-    from heat.engine.resources.openstack.neutron import neutron
 from heat.engine import properties
 
-from neutronclient.common.exceptions import NeutronClientException
-from neutronclient.neutron import v2_0 as neutronV20
+from vnc_api import vnc_api
+from contrail_heat.resources.contrail import ContrailResource
+
 try:
     from heat.openstack.common import log as logging
 except ImportError:
@@ -19,12 +16,18 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class AttachPolicy(neutron.NeutronResource):
+class AttachPolicy(ContrailResource):
 
     PROPERTIES = (
-        NETWORK, POLICY,
+        NETWORK, POLICY, SEQUENCE
     ) = (
-        'network', 'policy',
+        'network', 'policy', 'sequence'
+    )
+
+    _SEQUENCE_KEYS = (
+        MAJOR, MINOR
+    ) = (
+        'major', 'minor'
     )
 
     properties_schema = {
@@ -34,44 +37,65 @@ class AttachPolicy(neutron.NeutronResource):
             required=True),
         POLICY: properties.Schema(
             properties.Schema.STRING,
-            description=_('policy name FQ name notation'),
+            description=_('The policy id or fq_name_string'),
             required=True),
+        SEQUENCE: properties.Schema(
+            properties.Schema.MAP,
+            _('Order of the policy'),
+            schema={
+                MAJOR: properties.Schema(
+                    properties.Schema.INTEGER,
+                    _('Major number to define the order of this policy'),
+                    default=0,
+                ),
+                MINOR: properties.Schema(
+                    properties.Schema.INTEGER,
+                    _('Minor number to define the order of this policy'),
+                    default=0,
+                )
+            }
+        ),
     }
 
     def handle_create(self):
-        if not ":" in self.properties.get(self.NETWORK):
-            network = self.properties.get(self.NETWORK)
-        else:
-            network = self.properties.get(self.NETWORK).split(":")[2]
-        network_id = neutronV20.find_resourceid_by_name_or_id(
-            self.neutron(), 'network', network)
+        try:
+            vn_obj = self.vnc_lib().virtual_network_read(
+                id=self.properties.get(self.NETWORK))
+        except vnc_api.NoIdError:
+            vn_obj = self.vnc_lib().virtual_network_read(
+                fq_name_str=self.properties.get(self.NETWORK))
 
-        policies = self.neutron().show_network(network_id).get('network').get('contrail:policys')
-        if not policies:
-            policies = []
-        policies.append(self.properties.get(self.POLICY).split(':'))
-        self.neutron().update_network(network_id, {'network':
-                                     {'contrail:policys': policies}})
-        self.resource_id_set(
-            '%s|%s' % (network_id, self.properties.get(self.POLICY)))
+        try:
+            policy_obj = self.vnc_lib().network_policy_read(
+                id=self.properties.get(self.POLICY))
+        except vnc_api.NoIdError:
+            policy_obj = self.vnc_lib().network_policy_read(
+                fq_name_str=self.properties.get(self.POLICY))
+
+        if self.properties[self.SEQUENCE] is None:
+            major = 0
+            minor = 0
+        else:
+            major = self.properties[self.SEQUENCE][self.MAJOR]
+            minor = self.properties[self.SEQUENCE][self.MINOR]
+
+        policy_order = vnc_api.VirtualNetworkPolicyType(vnc_api.SequenceType(major, minor))
+
+        self.vnc_lib().ref_update('virtual-network', vn_obj.uuid,
+                                 'network-policy', policy_obj.uuid, None, 'ADD', policy_order)
+
+        self.resource_id_set('%s|%s' % (vn_obj.uuid, policy_obj.uuid))
 
     def handle_delete(self):
         if not self.resource_id:
             return
-        (network_id, policy) = self.resource_id.split('|')
+        (network_id, policy_id) = self.resource_id.split('|')
         try:
-            policies = self.neutron().show_network(
-                network_id).get('network').get('contrail:policys', [])
-            try:
-                policies.remove(policy.split(':'))
-            except ValueError:
-                return
-            self.neutron().update_network(network_id, {'network':
-                                         {'contrail:policys': policies}})
-        except NeutronClientException as ex:
-            if ex.status_code != 404:
-                raise ex
-
+            self.vnc_lib().ref_update('virtual-network', network_id,
+                                    'network-policy', policy_id, None, 'DELETE')
+        except Exception as ex:
+            self._ignore_not_found(ex)
+            LOG.warn(_("Virtual Network %s already deleted.") % network_id)
 
 def resource_mapping():
     return {
