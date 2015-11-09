@@ -4,6 +4,10 @@ description: >
   HOT template to create a network policy for applying
   service between two VNs created before.
   Attach the network policy to two virtual networks
+  For the first network policy is attached at position specified by major/minor
+  number
+  For the second network, network policy is attached as the first policy with
+  default major, minor number i.e. 0,0
 
 parameters:
   policy_name:
@@ -33,6 +37,12 @@ parameters:
   private_net_2_name:
     type: string
     description: Name of private network to be created
+  major:
+    type: number
+    description: Define the position where policy needs to be inserted
+  minor:
+    type: number
+    description:  Define the position where policy needs to be inserted
 
 resources:
   private_policy:
@@ -56,6 +66,9 @@ resources:
     properties:
       network: { get_param: private_net_1_name }
       policy: { get_attr: [private_policy, fq_name] }
+      sequence:
+          major: { get_param: major }
+          minor: { get_param: minor }
 
   private_policy_attach_net2:
     type: OS::Contrail::AttachPolicy
