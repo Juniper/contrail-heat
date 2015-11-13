@@ -19,10 +19,10 @@ LOG = logging.getLogger(__name__)
 class ContrailVirtualNetwork(contrail.ContrailResource):
     PROPERTIES = (
         NAME, ROUTE_TARGETS, SHARED, EXTERNAL, ALLOW_TRANSIT,
-        FORWARDING_MODE
+        FORWARDING_MODE, FLOOD_UNKNOWN_UNICAST
     ) = (
         'name', 'route_targets', 'shared', 'external', 'allow_transit',
-        'forwarding_mode'
+        'forwarding_mode', 'flood_unknown_unicast'
     )
 
     properties_schema = {
@@ -75,6 +75,15 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             ],
             update_allowed=True
         ),
+        FLOOD_UNKNOWN_UNICAST: properties.Schema(
+            properties.Schema.STRING,
+            _('Whether L2 packets should be flooded to all the ports connected on this network.'),
+            default='False',
+            constraints=[
+                constraints.AllowedValues(['True', 'False']),
+            ],
+            update_allowed=True
+        ),
     }
     attributes_schema = {
         "name": _("The name of the Virtual Network."),
@@ -84,6 +93,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         "external": _("external."),
         "allow_transit": _("allow_transit."),
         "forwarding_mode": _("forwarding_mode."),
+        "flood_unknown_unicast":_("L2 packets flooded to all ports on network."),
         "show": _("All attributes."),
     }
 
@@ -112,6 +122,10 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             vn_obj.set_router_external(True)
         else:
             vn_obj.set_router_external(False)
+        if self.properties[self.FLOOD_UNKNOWN_UNICAST] == "True":
+            vn_obj.set_flood_unknown_unicast(True)
+        else:
+            vn_obj.set_flood_unknown_unicast(False)
         vn_uuid = self.vnc_lib().virtual_network_create(vn_obj)
         self.resource_id_set(vn_uuid)
 
@@ -149,6 +163,11 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         if rt_list:
             vn_obj.set_route_target_list(vnc_api.RouteTargetList(
                 ["target:" + route for route in rt_list]))
+         
+        if prop_diff.get(self.FLOOD_UNKNOWN_UNICAST) == "True":
+            vn_obj.set_flood_unknown_unicast(True)
+        else:
+            vn_obj.set_flood_unknown_unicast(False)
         self.vnc_lib().virtual_network_update(vn_obj)
 
     def _show_resource(self):
@@ -162,6 +181,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             ],
             'shared': vn_obj.get_is_shared(),
             'external': vn_obj.get_router_external(),
+            'flood_unknown_unicast':vn_obj.get_flood_unknown_unicast(),
         }
         return attrs
 
