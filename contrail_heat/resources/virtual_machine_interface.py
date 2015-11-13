@@ -12,8 +12,10 @@ import uuid
 class HeatVirtualMachineInterface(contrail.ContrailResource):
     PROPERTIES = (
         NAME, VIRTUAL_MACHINE_INTEFRACE_MAC_ADDRESSES, VIRTUAL_NETWORKS,
+        PORT_TUPLES, SERVICE_INTERFACE_TYPE
     ) = (
         'name', 'virtual_machine_interface_mac_addresses', 'virtual_networks',
+        'port_tuples', 'service_interface_type'
     )
 
     properties_schema = {
@@ -34,16 +36,39 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
             default=[],
             update_allowed=False,  # TODO check if it's allowed
         ),
+        PORT_TUPLES: properties.Schema(
+            properties.Schema.LIST,
+            _('List of port tuples.'),
+            default=[],
+            update_allowed=False,  # TODO check if it's allowed
+        ),
+        SERVICE_INTERFACE_TYPE: properties.Schema(
+            properties.Schema.STRING,
+            _('Service Interface Type.'),
+            update_allowed=False
+        ),
         # TODO add additional properties which are currently needed
     }
 
     attributes_schema = {
         "name": _("The name of the Virtual Network."),
         "fq_name": _("The FQ name of the Virtual Network."),
+        "service_interface_type": _("Service interface type."),
         "virtual_machine_interface_mac_addresses": _("List of mac addresses."),
         "virtual_networks": _("List of virtual networks FQ names."),
+        "port_tuples": _("List of port tuple FQ names."),
         "show": _("All attributes."),
     }
+
+    def _allocate_iip_for_family(self, vn_obj, iip_name, iip_family):
+        iip_name = iip_name + '-' + iip_family
+        iip_obj = vnc_api.InstanceIp(name=iip_name, instance_ip_family=iip_family)
+        iip_obj.add_virtual_network(vn_obj)
+        try:
+            self.vnc_lib().instance_ip_create(iip_obj)
+        except vnc_api.RefsExistError:
+            iip_obj = self.vnc_lib().instance_ip_read(fq_name=[iip_name])
+        return iip_obj
 
     def handle_create(self):
         tenant_id = self.stack.context.tenant_id
@@ -54,24 +79,57 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
             vnc_api.MacAddressesType(
                 self.properties[self.VIRTUAL_MACHINE_INTEFRACE_MAC_ADDRESSES]))
         for network in self.properties[self.VIRTUAL_NETWORKS]:
-            vn_obj = self.vnc_lib().virtual_network_read(id=network)
+            try:
+                vn_obj = self.vnc_lib().virtual_network_read(id=network)
+            except vnc_api.NoIdError:
+                vn_obj = self.vnc_lib().virtual_network_read(fq_name_str=network)
             vmi_obj.add_virtual_network(vn_obj)
+
+        for port_tuple in self.properties[self.PORT_TUPLES]:
+            try:
+                pt_obj = self.vnc_lib().port_tuple_read(id=port_tuple)
+            except vnc_api.NoIdError:
+                pt_obj = self.vnc_lib().port_tuple_read(fq_name_str=port_tuple)
+            vmi_obj.add_port_tuple(pt_obj)
+        vmi_props = vnc_api.VirtualMachineInterfacePropertiesType()
+        vmi_props.set_service_interface_type(self.properties[self.SERVICE_INTERFACE_TYPE])
+        vmi_obj.set_virtual_machine_interface_properties(vmi_props)
         vmi_uuid = self.vnc_lib().virtual_machine_interface_create(vmi_obj)
+
+        iip_obj = self._allocate_iip_for_family(vn_obj, vmi_obj.uuid, 'v4')
+        iip_obj.add_virtual_machine_interface(vmi_obj)
+        self.vnc_lib().instance_ip_update(iip_obj)
+
         self.resource_id_set(vmi_uuid)
 
     def _show_resource(self):
-        vmi_obj = self.vnc_lib().virtual_network_read(id=self.resource_id)
+        vmi_obj = self.vnc_lib().virtual_machine_interface_read(id=self.resource_id)
         dic = {}
         dic['name'] = vmi_obj.get_display_name()
         dic['fq_name'] = vmi_obj.get_fq_name_str()
+        dic['service_interface_type'] = \
+            vmi_obj.get_virtual_machine_properties.get_service_interface_type()
         dic['virtual_machine_interface_mac_addresses'] = (
             vmi_obj.get_virtual_machine_interface_mac_addresses().
             get_mac_address())
         dic['virtual_networks'] = (
             [vn['to'] for vn in vmi_obj.get_virtual_network_refs() or []])
+        dic['port_tuples'] = (
+            [pt['to'] for pt in vmi_obj.get_port_tuple_refs() or []])
         return dic
 
     def handle_delete(self):
+        try:
+            vmi_obj = self.vnc_lib().virtual_machine_interface_read(id=self.resource_id)
+        except Exception:
+            return
+
+        for iip in vmi_obj.get_instance_ip_back_refs() or []:
+            try:
+                self.vnc_lib().instance_ip_delete(id=iip['uuid'])
+            except vnc_api.NoIdError:
+                pass
+
         try:
             self.vnc_lib().virtual_machine_interface_delete(
                 id=self.resource_id)

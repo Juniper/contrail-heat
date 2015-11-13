@@ -291,8 +291,8 @@ class HeatServiceInstance(ContrailResource):
 
         except vnc_api.NoIdError:
             LOG.warn(_("Service Instance %s not found.") % self.name)
-        except:
-            LOG.warn(_("Unknown error."))
+        except Exception as e:
+            LOG.warn(_("Unknown error %s.") % str(e))
             raise
 
     def _show_resource(self):
