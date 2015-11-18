@@ -119,6 +119,8 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
         return dic
 
     def handle_delete(self):
+        if not self.resource_id:
+            return
         try:
             vmi_obj = self.vnc_lib().virtual_machine_interface_read(id=self.resource_id)
         except Exception:

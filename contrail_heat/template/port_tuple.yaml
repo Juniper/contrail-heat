@@ -5,6 +5,9 @@ parameters:
     type: string
     label: Service template fq name
     description: Service template for port tuple
+  service_version:
+    type: string
+    description: service version
   service_mode:
     type: string
     description: service mode
@@ -89,6 +92,7 @@ resources:
     type: OS::Contrail::ServiceTemplate
     properties:
       name: { get_param: service_template_name }
+      service_version: { get_param: service_version }
       service_mode: { get_param: service_mode }
       service_type: { get_param: service_type }
       image_name: { get_param: service_image }

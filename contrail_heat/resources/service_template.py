@@ -19,12 +19,13 @@ class HeatServiceTemplate(ContrailResource):
         NAME, DOMAIN, SERVICE_MODE, SERVICE_TYPE, IMAGE_NAME,
         SERVICE_SCALING, SERVICE_INTERFACE_TYPE_LIST, SHARED_IP_LIST,
         STATIC_ROUTES_LIST, FLAVOR, ORDERED_INTERFACES,
-        SERVICE_VIRT_TYPE, AVAILABILITY_ZONE_ENABLE
+        SERVICE_VIRT_TYPE, AVAILABILITY_ZONE_ENABLE, SERVICE_VERSION
     ) = (
         'name', 'domain', 'service_mode', 'service_type', 'image_name',
         'service_scaling', 'service_interface_type_list', 'shared_ip_list',
         'static_routes_list', 'flavor', 'ordered_interfaces',
-        'service_virtualization_type', 'availability_zone_enable'
+        'service_virtualization_type', 'availability_zone_enable',
+        'service_version'
     )
 
     _INTERFACE_KEYS = (
@@ -137,7 +138,16 @@ class HeatServiceTemplate(ContrailResource):
                 constraints.AllowedValues(['True', 'False']),
             ],
             update_allowed=False
-        )
+        ),
+        SERVICE_VERSION: properties.Schema(
+            properties.Schema.STRING,
+            _('Indicates version for the template'),
+            constraints=[
+                constraints.AllowedValues([2]),
+            ],
+            default='2',
+            update_allowed=False
+        ),
     }
 
     attributes_schema = {
@@ -173,6 +183,7 @@ class HeatServiceTemplate(ContrailResource):
             self.properties[self.SERVICE_VIRT_TYPE])
         svc_properties.set_ordered_interfaces(
             self.properties[self.ORDERED_INTERFACES])
+        svc_properties.set_version(int(self.properties[self.SERVICE_VERSION]))
         # set interface list
         itf_list = self.properties[self.SERVICE_INTERFACE_TYPE_LIST]
         for itf in itf_list:
