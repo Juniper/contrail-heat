@@ -60,8 +60,26 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
         "show": _("All attributes."),
     }
 
-    def _allocate_iip_for_family(self, vn_obj, iip_name, iip_family):
-        iip_name = iip_name + '-' + iip_family
+    def _get_iip_name(self, pt_obj, vmi_obj, iip_family):
+        try:
+            si_obj = self.vnc_lib().service_instance_read(id=pt_obj.parent_uuid)
+            st_list = si_obj.get_service_template_refs()
+            st_obj = self.vnc_lib().service_template_read(id=st_list[0]['uuid'])
+            st_props = st_obj.get_service_template_properties()
+            st_if_list = st_props.get_interface_type()
+        except Exception as e:
+            return('-'.join([vmi_obj.uuid, if_type, iip_family]))
+
+        if_type = self.properties[self.SERVICE_INTERFACE_TYPE]
+        for vmi_index in range(0, len(st_if_list)):
+            if ((if_type == st_if_list[vmi_index].service_interface_type) and
+                    (st_if_list[vmi_index].shared_ip)):
+                return('-'.join([si_obj.uuid, if_type, str(vmi_index), iip_family]))
+
+        return('-'.join([vmi_obj.uuid, if_type, iip_family]))
+
+    def _allocate_iip_for_family(self, vn_obj, pt_obj, vmi_obj, iip_family):
+        iip_name = self._get_iip_name(pt_obj, vmi_obj, iip_family)
         iip_obj = vnc_api.InstanceIp(name=iip_name, instance_ip_family=iip_family)
         iip_obj.add_virtual_network(vn_obj)
         try:
@@ -96,7 +114,7 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
         vmi_obj.set_virtual_machine_interface_properties(vmi_props)
         vmi_uuid = self.vnc_lib().virtual_machine_interface_create(vmi_obj)
 
-        iip_obj = self._allocate_iip_for_family(vn_obj, vmi_obj.uuid, 'v4')
+        iip_obj = self._allocate_iip_for_family(vn_obj, pt_obj, vmi_obj, 'v4')
         iip_obj.add_virtual_machine_interface(vmi_obj)
         self.vnc_lib().instance_ip_update(iip_obj)
 
