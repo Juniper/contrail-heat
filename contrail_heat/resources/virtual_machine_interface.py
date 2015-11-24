@@ -56,7 +56,7 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
         for network in self.properties[self.VIRTUAL_NETWORKS]:
             vn_obj = self.vnc_lib().virtual_network_read(id=network)
             vmi_obj.add_virtual_network(vn_obj)
-        vmi_uuid = self.vnc_lib().virtual_machine_interface_create(vmi_obj)
+        vmi_uuid = super(HeatVirtualMachineInterface, self).resource_create(vmi_obj) 
         self.resource_id_set(vmi_uuid)
 
     def _show_resource(self):
