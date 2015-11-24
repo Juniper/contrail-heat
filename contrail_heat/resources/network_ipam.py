@@ -35,7 +35,7 @@ class HeatNetworkIpam(contrail.ContrailResource):
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
         ni_obj = vnc_api.NetworkIpam(name=self.properties[self.NAME],
                                      parent_obj=project_obj)
-        ni_uuid = self.vnc_lib().network_ipam_create(ni_obj)
+        ni_uuid = super(HeatNetworkIpam, self).resource_create(ni_obj)
         self.resource_id_set(ni_uuid)
 
     def _show_resource(self):
