@@ -8,6 +8,8 @@ try:
 except ImportError:
     from oslo_log import log as logging
 from vnc_api import vnc_api
+from vnc_api.vnc_api import NoIdError, RefsExistError
+import uuid
 
 LOG = logging.getLogger(__name__)
 
@@ -109,3 +111,19 @@ class ContrailResource(resource.Resource):
                                            self._api_base_url,
                                            auth_host=self._auth_host_ip)
         return self._vnc_lib
+
+    # This function will make sure you can create resources with same name. 
+    def resource_create(self, obj):
+         resource_type = obj.get_type()
+         resource_type = resource_type.replace('-','_')
+         create_method = getattr(self._vnc_lib, resource_type + '_create')
+         try:
+             obj_uuid = create_method(obj)
+         except RefsExistError:
+             obj.uuid = str(uuid.uuid4())
+             obj.name += '-' + obj.uuid
+             obj.fq_name[-1] += '-' + obj.uuid
+             obj_uuid = create_method(obj)
+ 
+         return obj_uuid
+    #end _resource_create

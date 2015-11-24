@@ -57,6 +57,22 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
             vn_obj = self.vnc_lib().virtual_network_read(id=network)
             vmi_obj.add_virtual_network(vn_obj)
         vmi_uuid = self.vnc_lib().virtual_machine_interface_create(vmi_obj)
+
+        for port_tuple in self.properties[self.PORT_TUPLES]:
+            try:
+                pt_obj = self.vnc_lib().port_tuple_read(id=port_tuple)
+            except vnc_api.NoIdError:
+                pt_obj = self.vnc_lib().port_tuple_read(fq_name_str=port_tuple)
+            vmi_obj.add_port_tuple(pt_obj)
+        vmi_props = vnc_api.VirtualMachineInterfacePropertiesType()
+        vmi_props.set_service_interface_type(self.properties[self.SERVICE_INTERFACE_TYPE])
+        vmi_obj.set_virtual_machine_interface_properties(vmi_props)
+        vmi_uuid = super(HeatVirtualMachineInterface, self).resource_create(vmi_obj) 
+
+        iip_obj = self._allocate_iip_for_family(vn_obj, pt_obj, vmi_obj, 'v4')
+        iip_obj.add_virtual_machine_interface(vmi_obj)
+        self.vnc_lib().instance_ip_update(iip_obj)
+
         self.resource_id_set(vmi_uuid)
 
     def _show_resource(self):
