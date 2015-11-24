@@ -227,7 +227,7 @@ class NetworkPolicy(ContrailResource):
                                        parent_obj=project_obj)
         np_obj.set_network_policy_entries(
             vnc_api.PolicyEntriesType.factory(**props['entries']))
-        np_uuid = self.vnc_lib().network_policy_create(np_obj)
+        np_uuid = super(NetworkPolicy, self).resource_create(np_obj) 
         self.resource_id_set(np_uuid)
 
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):

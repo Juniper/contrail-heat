@@ -126,7 +126,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             vn_obj.set_flood_unknown_unicast(True)
         else:
             vn_obj.set_flood_unknown_unicast(False)
-        vn_uuid = self.vnc_lib().virtual_network_create(vn_obj)
+        vn_uuid = super(ContrailVirtualNetwork, self).resource_create(vn_obj)
         self.resource_id_set(vn_uuid)
 
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
@@ -163,7 +163,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         if rt_list:
             vn_obj.set_route_target_list(vnc_api.RouteTargetList(
                 ["target:" + route for route in rt_list]))
-         
+ 
         if prop_diff.get(self.FLOOD_UNKNOWN_UNICAST) == "True":
             vn_obj.set_flood_unknown_unicast(True)
         else:
