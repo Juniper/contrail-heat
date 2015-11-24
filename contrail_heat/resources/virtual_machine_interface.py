@@ -112,7 +112,7 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
         vmi_props = vnc_api.VirtualMachineInterfacePropertiesType()
         vmi_props.set_service_interface_type(self.properties[self.SERVICE_INTERFACE_TYPE])
         vmi_obj.set_virtual_machine_interface_properties(vmi_props)
-        vmi_uuid = self.vnc_lib().virtual_machine_interface_create(vmi_obj)
+        vmi_uuid = super(HeatVirtualMachineInterface, self).resource_create(vmi_obj) 
 
         iip_obj = self._allocate_iip_for_family(vn_obj, pt_obj, vmi_obj, 'v4')
         iip_obj.add_virtual_machine_interface(vmi_obj)
