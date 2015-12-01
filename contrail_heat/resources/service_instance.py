@@ -171,7 +171,7 @@ class HeatServiceInstance(ContrailResource):
         if_index = 0
         si_prop = vnc_api.ServiceInstanceType()
         for intf in self.properties[self.INTERFACE_LIST]:
-            virt_net = intf[self.VIRTUAL_NETWORK]
+            virt_net = project_obj.get_fq_name_str() + ':' + intf[self.VIRTUAL_NETWORK]
             if virt_net == "auto":
                 vn_name = ""
             elif not ":" in virt_net:
@@ -273,11 +273,20 @@ class HeatServiceInstance(ContrailResource):
                 break
 
     def handle_delete(self):
+        if not self.resource_id:
+            return
         try:
-            # get the servers list
             si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
-            vm_uuid_list = list(si_obj.get_virtual_machine_back_refs() or [])
+        except vnc_api.NoIdError:
+            return
 
+        iip_refs = si_obj.get_instance_ip_refs()
+        for iip in iip_refs or []:
+            self._vnc_lib.ref_update('service-instance', si_obj.uuid,
+                'instance-ip', iip['uuid'], None, 'DELETE')
+
+        vm_uuid_list = list(si_obj.get_virtual_machine_back_refs() or [])
+        try:
             self.vnc_lib().service_instance_delete(id=self.resource_id)
 
             for vm_uuid in vm_uuid_list or []:
