@@ -1,261 +1,64 @@
 heat_template_version: 2013-05-23
 
 parameters:
-  service_template_name:
+  network1:
     type: string
-    label: Service template fq name
-    description: Service template for port tuple
-  service_version:
+    description: Name of management network to be created
+  network2:
     type: string
-    description: Indicates service version
-  service_mode:
+    description: Name of left network to be created
+  network3:
     type: string
-    description: service mode
-  service_type:
-    type: string
-    description: service type
-  service_image:
+    description: Name of right network to be created
+  image:
     type: string
     description: Name of the image
-  service_flavor:
+  flavor:
     type: string
     description: Flavor
-  service_interface_type_list:
-    type: string
-    description: List of interface types
-  service_ordered_interfaces:
-    type: string
-    description: Indicates service interfaces are ordered
-  service_shared_ip_list:
-    type: string
-    description: List of shared ip enabled-disabled
-  service_static_routes_list:
-    type: string
-    description: List of static routes enabled-disabled
-  service_scaling:
-    type: string
-    description: Indicates whether service scaling is enabled
-  service_availability_zone:
-    type: string
-    description: Indicates availability zone is enabled
-  service_virtualization_type:
-    type: string
-    description: Indicates virtualization type
-
   service_instance_name:
     type: string
     label: Service instance fq name
     description: Service instance for port tuple
-  management_vn_name:
-    type: string
-    description: Name of management network to be created
-  left_vn_name:
-    type: string
-    description: Name of left network to be created
-  right_vn_name:
-    type: string
-    description: Name of right network to be created
-
-  port_tuple_1_name:
-    type: string
-    label: Name for port tuple
-    description: Port tuple for service instance
-  port_tuple_1_port_1_name:
-    type: string
-    label: Service port fq name
-    description: Service port 1 for port tuple
-  port_tuple_1_port_1_type:
-    type: string
-    description: Service port 1 type
-  port_tuple_1_port_2_name:
-    type: string
-    label: Service port fq name
-    description: Service port 2 for port tuple
-  port_tuple_1_port_2_type:
-    type: string
-    description: Service port 2 type
-  port_tuple_1_port_3_name:
-    type: string
-    label: Service port fq name
-    description: Service port 3 for port tuple
-  port_tuple_1_port_3_type:
-    type: string
-    description: Service port 3 type
-  port_tuple_1_vm_name:
-    type: string
-    label: Name for service vm
-    description: Service vm with port tuple
-
-  port_tuple_2_name:
-    type: string
-    label: Name for port tuple
-    description: Port tuple for service instance
-  port_tuple_2_port_1_name:
-    type: string
-    label: Service port fq name
-    description: Service port 1 for port tuple
-  port_tuple_2_port_1_type:
-    type: string
-    description: Service port 1 type
-  port_tuple_2_port_2_name:
-    type: string
-    label: Service port fq name
-    description: Service port 2 for port tuple
-  port_tuple_2_port_2_type:
-    type: string
-    description: Service port 2 type
-  port_tuple_2_port_3_name:
-    type: string
-    label: Service port fq name
-    description: Service port 3 for port tuple
-  port_tuple_2_port_3_type:
-    type: string
-    description: Service port 3 type
-  port_tuple_2_vm_name:
-    type: string
-    label: Name for service vm
-    description: Service vm with port tuple
-
 
 resources:
-  service_template:
-    type: OS::Contrail::ServiceTemplate
+  port_1:
+    type: "OS::Neutron::Port"
     properties:
-      name: { get_param: service_template_name }
-      service_version: { get_param: service_version }
-      service_mode: { get_param: service_mode }
-      service_type: { get_param: service_type }
-      image_name: { get_param: service_image }
-      ordered_interfaces: { get_param: service_ordered_interfaces }
-      flavor: { get_param: service_flavor }
-      service_interface_type_list: { "Fn::Split" : [ ",", Ref: service_interface_type_list ] }
-      service_scaling: { get_param: service_scaling }
-      availability_zone_enable: { get_param: service_availability_zone }
-      shared_ip_list: { "Fn::Split" : [ ",", Ref: service_shared_ip_list ] }
-      static_routes_list: { "Fn::Split" : [ ",", Ref: service_static_routes_list ] }
-      service_virtualization_type: { get_param: service_virtualization_type }
+      admin_state_up: true
+      network_id: { get_param: network1 }
 
-  service_instance:
-    type: OS::Contrail::ServiceInstance
+  port_2:
+    type: "OS::Neutron::Port"
     properties:
-      name: { get_param: service_instance_name }
-      service_template: { get_resource:  service_template }
-      interface_list: [
-        { virtual_network: {get_param: management_vn_name} },
-        { virtual_network: {get_param: left_vn_name} },
-        { virtual_network: {get_param: right_vn_name} }
+      admin_state_up: true
+      network_id: { get_param: network2 }
+
+  port_3:
+    type: "OS::Neutron::Port"
+    properties:
+      admin_state_up: true
+      network_id: { get_param: network3 }
+
+  instance:
+    type: OS::Nova::Server
+    properties:
+      name: 
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - port: { get_resource: port_1 }
+        - port: { get_resource: port_2 }
+        - port: { get_resource: port_3 }
+
+  port_tuple:
+    type: OS::Contrail::PortTuple
+    depends_on: [ instance, port_1, port_2, port_3 ]
+    properties:
+      name: { get_attr: [instance, name] } 
+      service_instance: { get_param: service_instance_name } 
+      ports: [
+        { get_resource: port_1 },
+        { get_resource: port_2 },
+        { get_resource: port_3 }
       ]
-
-  port_tuple_1:
-    type: OS::Contrail::PortTuple
-    depends_on: [service_instance]
-    properties:
-      name: { get_param: port_tuple_1_name } 
-      service_instance: { get_resource: service_instance } 
-
-  port_tuple_1_port_1:
-    type: "OS::Contrail::VirtualMachineInterface"
-    properties:
-      name: { get_param: port_tuple_1_port_1_name }
-      virtual_networks: [{ get_param: management_vn_name }]
-      port_tuples: [{ get_resource: port_tuple_1}]
-      service_interface_type: { get_param: port_tuple_1_port_1_type }
-
-  port_tuple_1_port_2:
-    type: "OS::Contrail::VirtualMachineInterface"
-    properties:
-      name: { get_param: port_tuple_1_port_2_name }
-      virtual_networks: [{ get_param: left_vn_name }]
-      port_tuples: [{ get_resource: port_tuple_1}]
-      service_interface_type: { get_param: port_tuple_1_port_2_type }
-
-  port_tuple_1_port_3:
-    type: "OS::Contrail::VirtualMachineInterface"
-    properties:
-      name: { get_param: port_tuple_1_port_3_name }
-      virtual_networks: [{ get_param: right_vn_name }]
-      port_tuples: [{ get_resource: port_tuple_1}]
-      service_interface_type: { get_param: port_tuple_1_port_3_type }
-
-  group_1:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      cooldown: 60
-      desired_capacity: 1
-      max_size: 1
-      min_size: 1
-      resource:
-        type: OS::Nova::Server
-        properties:
-          name: { get_param: port_tuple_1_vm_name }
-          image: { get_param: service_image }
-          flavor: { get_param: service_flavor }
-          networks:
-            - port: { get_resource: port_tuple_1_port_1 }
-            - port: { get_resource: port_tuple_1_port_2 }
-            - port: { get_resource: port_tuple_1_port_3 }
-
-  scaleup_policy_1:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: { get_resource: group_1 }
-      cooldown: 60
-      scaling_adjustment: 1
-
-  port_tuple_2:
-    type: OS::Contrail::PortTuple
-    depends_on: [service_instance]
-    properties:
-      name: { get_param: port_tuple_2_name } 
-      service_instance: { get_resource: service_instance } 
-
-  port_tuple_2_port_1:
-    type: "OS::Contrail::VirtualMachineInterface"
-    properties:
-      name: { get_param: port_tuple_2_port_1_name }
-      virtual_networks: [{ get_param: management_vn_name }]
-      port_tuples: [{ get_resource: port_tuple_2}]
-      service_interface_type: { get_param: port_tuple_2_port_1_type }
-
-  port_tuple_2_port_2:
-    type: "OS::Contrail::VirtualMachineInterface"
-    properties:
-      name: { get_param: port_tuple_2_port_2_name }
-      virtual_networks: [{ get_param: left_vn_name }]
-      port_tuples: [{ get_resource: port_tuple_2}]
-      service_interface_type: { get_param: port_tuple_2_port_2_type }
-
-  port_tuple_2_port_3:
-    type: "OS::Contrail::VirtualMachineInterface"
-    properties:
-      name: { get_param: port_tuple_2_port_3_name }
-      virtual_networks: [{ get_param: right_vn_name }]
-      port_tuples: [{ get_resource: port_tuple_2}]
-      service_interface_type: { get_param: port_tuple_2_port_3_type }
-
-  group_2:
-    type: OS::Heat::AutoScalingGroup
-    properties:
-      cooldown: 60
-      desired_capacity: 1
-      max_size: 1
-      min_size: 1
-      resource:
-        type: OS::Nova::Server
-        properties:
-          name: { get_param: port_tuple_2_vm_name }
-          image: { get_param: service_image }
-          flavor: { get_param: service_flavor }
-          networks:
-            - port: { get_resource: port_tuple_2_port_1 }
-            - port: { get_resource: port_tuple_2_port_2 }
-            - port: { get_resource: port_tuple_2_port_3 }
-
-  scaleup_policy_2:
-    type: OS::Heat::ScalingPolicy
-    properties:
-      adjustment_type: change_in_capacity
-      auto_scaling_group_id: { get_resource: group_2 }
-      cooldown: 60
-      scaling_adjustment: 1
