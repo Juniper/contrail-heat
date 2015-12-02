@@ -64,15 +64,16 @@ class HeatRouteTable(ContrailResource):
     update_allowed_keys = ('Properties',)
 
     def handle_create(self):
+        tenant_id = self.stack.context.tenant_id
+        project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
         try:
             si_obj = self.vnc_lib().service_instance_read(
                 id=self.properties[self.SERVICE_INSTANCE])
         except vnc_api.NoIdError:
-            si_obj = self.vnc_lib().service_instance_read(
-                fq_name_str=self.properties[self.SERVICE_INSTANCE])
+            si_name = project_obj.fq_name + \
+                [self.properties[self.SERVICE_INSTANCE]]
+            si_obj = self.vnc_lib().service_instance_read(fq_name=si_name)
 
-        tenant_id = self.stack.context.tenant_id
-        project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
         route_table = vnc_api.RouteTableType()
         for route in self.properties[self.ROUTES]:
             route_table.add_route(vnc_api.RouteType(prefix=route))
@@ -88,12 +89,31 @@ class HeatRouteTable(ContrailResource):
         pass
 
     def handle_delete(self):
+        if not self.resource_id:
+            return
+
+        try:
+            rt_obj = self.vnc_lib().interface_route_table_read(id=self.resource_id)
+        except vnc_api.NoIdError:
+            return
+
+        # drop all references
+        si_refs = rt_obj.get_service_instance_refs()
+        for si in si_refs or []:
+            self._vnc_lib.ref_update('interface-route-table', rt_obj.uuid,
+                'service-instance', si['uuid'], None, 'DELETE')
+        vmi_back_refs = rt_obj.get_virtual_machine_interface_back_refs()
+        for vmi in vmi_back_refs or []:
+            self._vnc_lib.ref_update('virtual-machine-interface', vmi['uuid'],
+                'interface-route-table', rt_obj.uuid, None, 'DELETE')
+
+        # delete rt
         try:
             self.vnc_lib().interface_route_table_delete(id=self.resource_id)
         except vnc_api.NoIdError:
             LOG.warn(_("Route Table %s not found.") % self.name)
-        except:
-            LOG.warn(_("Unknown error."))
+        except Exception as e:
+            LOG.warn(_("Unknown error %s.") % str(e))
             raise
 
     def _show_resource(self):

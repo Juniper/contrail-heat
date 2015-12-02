@@ -275,29 +275,29 @@ class HeatServiceInstance(ContrailResource):
     def handle_delete(self):
         if not self.resource_id:
             return
+
         try:
             si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
         except vnc_api.NoIdError:
             return
 
+        # drop all references
         iip_refs = si_obj.get_instance_ip_refs()
         for iip in iip_refs or []:
             self._vnc_lib.ref_update('service-instance', si_obj.uuid,
                 'instance-ip', iip['uuid'], None, 'DELETE')
+        rt_back_refs = si_obj.get_interface_route_table_back_refs()
+        for rt in rt_back_refs or []:
+            self._vnc_lib.ref_update('interface-route-table', rt['uuid'],
+                'service-instance', si_obj.uuid, None, 'DELETE')
+        health_back_refs = si_obj.get_service_health_check_back_refs()
+        for health in health_back_refs or []:
+            self._vnc_lib.ref_update('service-health-check', health['uuid'],
+                'service-instance', si_obj.uuid, None, 'DELETE')
 
-        vm_uuid_list = list(si_obj.get_virtual_machine_back_refs() or [])
+        # delete si
         try:
             self.vnc_lib().service_instance_delete(id=self.resource_id)
-
-            for vm_uuid in vm_uuid_list or []:
-                try:
-                    vm = self.nova().servers.get(vm_uuid['to'][0])
-                except nova_exceptions.NotFound:
-                    pass
-                else:
-                    delete = scheduler.TaskRunner(self.delete_vm, vm)
-                    delete(wait_time=1.0)
-
         except vnc_api.NoIdError:
             LOG.warn(_("Service Instance %s not found.") % self.name)
         except Exception as e:
