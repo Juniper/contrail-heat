@@ -26,19 +26,19 @@ resources:
     type: "OS::Neutron::Port"
     properties:
       admin_state_up: true
-      network_id: { get_param: network1 }
+      network: { get_param: network1 }
 
   port_2:
     type: "OS::Neutron::Port"
     properties:
       admin_state_up: true
-      network_id: { get_param: network2 }
+      network: { get_param: network2 }
 
   port_3:
     type: "OS::Neutron::Port"
     properties:
       admin_state_up: true
-      network_id: { get_param: network3 }
+      network: { get_param: network3 }
 
   instance:
     type: OS::Nova::Server

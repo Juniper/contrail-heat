@@ -56,6 +56,13 @@ parameters:
     type: string
     description: Name of right network to be created
 
+  route_tag_1:
+    type: string
+    description: Tag of route table
+  route_list_1:
+    type: comma_delimited_list
+    description: List of routes
+
 resources:
   service_template:
     type: OS::Contrail::ServiceTemplate
@@ -85,10 +92,19 @@ resources:
         { virtual_network: {get_param: right_network} }
       ]
 
+  route_table_1:
+    type: OS::Contrail::RouteTable
+    depends_on: [ service_instance ]
+    properties:
+      name: { get_param: route_tag_1 }
+      service_instance: { get_param: service_instance_name }
+      service_port_tag: { get_param: route_tag_1 }
+      routes: { get_param: route_list_1 }
+
   instance_group:
     type: OS::Heat::AutoScalingGroup
     properties:
-      desired_capacity: 1
+      desired_capacity: 2
       max_size: 5
       min_size: 1
       resource:
