@@ -86,7 +86,20 @@ class HeatRouteTable(ContrailResource):
         self.resource_id_set(rt_uuid)
 
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
-        pass
+        try:
+            rt_obj = self.vnc_lib().interface_route_table_read(id=self.resource_id)
+        except vnc_api.NoIdError:
+            LOG.warn(_("Route table %s not found.") % self.name)
+            raise
+        except Exception as e:
+            LOG.warn(_("Unknown error %s.") % str(e))
+            raise
+
+        route_table = vnc_api.RouteTableType()
+        for route in prop_diff.get(self.ROUTES):
+            route_table.add_route(vnc_api.RouteType(prefix=route))
+        rt_obj.set_interface_route_table_routes(route_table)
+        self.vnc_lib().interface_route_table_update(rt_obj)
 
     def handle_delete(self):
         if not self.resource_id:
@@ -120,11 +133,16 @@ class HeatRouteTable(ContrailResource):
         rt_obj = self.vnc_lib().interface_route_table_read(id=self.resource_id)
         si_list = rt_obj.get_service_instance_refs()
         dict = {}
-        dict['name'] = pt_obj.get_display_name()
-        dict['fq_name'] = pt_obj.get_fq_name_str()
-        dict['tenant_id'] = si_obj.parent_uuid
+        dict['name'] = rt_obj.get_display_name()
+        dict['fq_name'] = rt_obj.get_fq_name_str()
+        dict['tenant_id'] = rt_obj.parent_uuid
+        dict['routes'] = []
+        route_table = rt_obj.get_interface_route_table_routes()
+        for route in route_table.get_route():
+            dict['routes'].append(route.get_prefix())
         if si_list:
-            dict['service_instance'] = ':'.join(si_list[0]['fq_name'])
+            dict['service_interface_tag'] = si_list[0]['attr'].get_interface_type()
+            dict['service_instance'] = si_list[0]['to'][-1]
         return dict
 
 
