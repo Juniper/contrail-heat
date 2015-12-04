@@ -58,10 +58,29 @@ parameters:
 
   route_tag_1:
     type: string
-    description: Tag of route table
+    description: Tag for route table
   route_list_1:
     type: comma_delimited_list
     description: List of routes
+
+  health_tag_1:
+    type: string
+    description: Tag for healt check
+  health_1_enabled:
+    type: boolean
+    description: Health check enabled
+  health_1_type:
+    type: string
+    description: Health check type
+  health_1_delay:
+    type: number
+    description: Health check delay
+  health_1_timeout:
+    type: number
+    description: Health check timeout
+  health_1_retries:
+    type: number
+    description: Health check retries
 
 resources:
   service_template:
@@ -100,6 +119,19 @@ resources:
       service_instance: { get_param: service_instance_name }
       service_port_tag: { get_param: route_tag_1 }
       routes: { get_param: route_list_1 }
+
+  health_check_1:
+    type: OS::Contrail::ServiceHealthCheck
+    depends_on: [ service_instance ]
+    properties:
+      name: { get_param: health_tag_1 } 
+      service_instance: { get_param: service_instance_name } 
+      service_port_tag: { get_param: health_tag_1 } 
+      monitor_type: { get_param: health_1_type } 
+      delay: { get_param: health_1_delay } 
+      timeout: { get_param: health_1_timeout } 
+      max_retries: { get_param: health_1_retries } 
+      enabled: { get_param: health_1_enabled } 
 
   instance_group:
     type: OS::Heat::AutoScalingGroup
