@@ -27,15 +27,21 @@ class HeatServiceInstance(ContrailResource):
     )
 
     _INTERFACE_LIST_KEYS = (
-        VIRTUAL_NETWORK, IP_ADDRESS, STATIC_ROUTES
+        VIRTUAL_NETWORK, IP_ADDRESS, STATIC_ROUTES, ALLOWED_ADDRESS_PAIRS
     ) = (
-        'virtual_network', 'ip_address', 'static_routes'
+        'virtual_network', 'ip_address', 'static_routes', 'allowed_address_pairs'
     )
 
     _STATIC_ROUTE_KEYS = (
         PREFIX, NEXT_HOP, NEXT_HOP_TYPE
     ) = (
         'prefix', 'next_hop', 'next_hop_type'
+    )
+
+    _ALLOWED_ADDRESS_PAIR_KEYS = (
+        PREFIX, MAC_ADDRESS, ADDRESS_MODE
+    ) = (
+        'prefix', 'mac_address', 'address_mode'
     )
 
     _SCALE_OUT_KEYS = (
@@ -105,6 +111,32 @@ class HeatServiceInstance(ContrailResource):
                             }
                         )
                     ),
+                    ALLOWED_ADDRESS_PAIRS: properties.Schema(
+                        properties.Schema.LIST,
+                        _('List of allowed address pair for this interface'),
+                        schema=properties.Schema(
+                            properties.Schema.MAP,
+                            schema={
+                                PREFIX: properties.Schema(
+                                    properties.Schema.STRING,
+                                    _('IP address prefix'),
+                                ),
+                                MAC_ADDRESS: properties.Schema(
+                                    properties.Schema.STRING,
+                                    _('Mac address'),
+                                    default=None,
+                                ),
+                                ADDRESS_MODE: properties.Schema(
+                                    properties.Schema.STRING,
+                                    _('Address mode active-active or active-standy'),
+                                    constraints=[
+                                        constraints.AllowedValues(['active-active', 'active-standby']),
+                                    ],
+                                    default=None,
+                                )
+                            }
+                        )
+                    ),
                 }
             ),
             update_allowed=False
@@ -150,6 +182,40 @@ class HeatServiceInstance(ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    def _set_allowed_address_pairs(self, intf):
+        aap_list = []
+        for aap_entry in intf.get(self.ALLOWED_ADDRESS_PAIRS, None) or []:
+            aap = vnc_api.AllowedAddressPair()
+            if aap_entry.get(self.PREFIX, None):
+                cidr = aap_entry.get(self.PREFIX).split('/')
+                if len(cidr) == 1:
+                    if (vnc_api.IPAddress(cidr[0]).version == 4):
+                        subnet=vnc_api.SubnetType(cidr[0], 32)
+                    elif (vnc_api.IPAddress(cidr[0]).version == 6):
+                        subnet=vnc_api.SubnetType(cidr[0], 128)
+                elif len(cidr) == 2:
+                    subnet=vnc_api.SubnetType(cidr[0], int(cidr[1]));
+                else:
+                    LOG.warn(_("'Invalid allowed address ip %s.") %
+                        aap_entry.get(self.PREFIX))
+                    raise
+            aap.set_ip(subnet)
+            aap.set_mac(aap_entry.get(self.MAC_ADDRESS, None))
+            if not aap_entry.get(self.MAC_ADDRESS, None):
+                aap.set_mac("")
+            else:
+                aap.set_mac(aap_entry.get(self.MAC_ADDRESS))
+            if not aap_entry.get(self.ADDRESS_MODE, None):
+                aap.set_address_mode("active-active")
+            else:
+                aap.set_address_mode(aap_entry.get(self.ADDRESS_MODE))
+            aap_list.append(aap)
+        if aap_list:
+            aaps = vnc_api.AllowedAddressPairs()
+            aaps.set_allowed_address_pair(aap_list)
+            return aaps
+        return None
+
     def handle_create(self):
         try:
             st_obj = self.vnc_lib().service_template_read(
@@ -186,8 +252,12 @@ class HeatServiceInstance(ContrailResource):
                 ) and self.STATIC_ROUTES in intf:
                 routes_list['route'] = intf[self.STATIC_ROUTES]
 
+            # allowed address pairs
+            aaps = self._set_allowed_address_pairs(intf)
+
             if_type = vnc_api.ServiceInstanceInterfaceType(
-                virtual_network=vn_name,static_routes=routes_list or None)
+                virtual_network=vn_name,static_routes=routes_list or None,
+                allowed_address_pairs=aaps)
             si_prop.add_interface_list(if_type)
             if_index = if_index + 1
 
@@ -231,6 +301,9 @@ class HeatServiceInstance(ContrailResource):
         scale_out = vnc_api.ServiceScaleOutType(max_instances=max_instances,
                                                 auto_scale=auto_scale)
         si_prop.set_scale_out(scale_out)
+
+        # allowed address pairs
+        aaps = self._set_allowed_address_pairs(intf)
 
         si_obj.set_service_instance_properties(si_prop)
         self.vnc_lib().service_instance_update(si_obj)

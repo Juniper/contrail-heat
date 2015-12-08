@@ -91,6 +91,9 @@ class HeatPortTuple(ContrailResource):
         pass
 
     def handle_delete(self):
+        if not self.resource_id:
+            return
+
         try:
             pt_obj = self.vnc_lib().port_tuple_read(id=self.resource_id)
         except vnc_api.NoIdError:

@@ -55,6 +55,18 @@ parameters:
   right_network:
     type: string
     description: Name of right network to be created
+  left_allowed_address_1_prefix:
+    type: string
+    description: Allowed address pair prefix
+  left_allowed_address_1_mac:
+    type: string
+    description: Allowed address pair mac
+  left_allowed_address_2_prefix:
+    type: string
+    description: Allowed address pair prefix
+  left_allowed_address_2_mode:
+    type: string
+    description: Allowed address pair mode
 
   route_tag_1:
     type: string
@@ -107,7 +119,15 @@ resources:
       service_template: { get_resource:  service_template }
       interface_list: [
         { virtual_network: {get_param: management_network} },
-        { virtual_network: {get_param: left_network} },
+        { 
+          virtual_network: {get_param: left_network},
+          allowed_address_pairs: [
+            {'prefix': {get_param: left_allowed_address_1_prefix},
+             'mac_address': {get_param: left_allowed_address_1_mac} },
+            {'prefix': {get_param: left_allowed_address_2_prefix},
+             'address_mode': {get_param: left_allowed_address_2_mode} },
+          ],
+        },
         { virtual_network: {get_param: right_network} }
       ]
 
