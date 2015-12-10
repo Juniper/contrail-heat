@@ -69,7 +69,11 @@ class HeatPortTuple(ContrailResource):
 
         pt_obj = vnc_api.PortTuple(
             name=self.properties[self.NAME], parent_obj=si_obj)
-        pt_uuid = self.vnc_lib().port_tuple_create(pt_obj)
+        try:
+            pt_uuid = self.vnc_lib().port_tuple_create(pt_obj)
+        except vnc_api.RefsExistError:
+            pt_obj = self.vnc_lib().port_tuple_read(fq_name=pt_obj.fq_name)
+            pt_uuid = pt_obj.uuid
 
         st_uuid = si_obj.get_service_template_refs()[0]['uuid']
         st_obj = self.vnc_lib().service_template_read(id=st_uuid)
