@@ -193,7 +193,7 @@ class HeatServiceHealthCheck(ContrailResource):
         for si in si_refs or []:
             self._vnc_lib.ref_update('service-health-check', health_obj.uuid,
                 'service-instance', si['uuid'], None, 'DELETE')
-        vmi_back_refs = rt_obj.get_virtual_machine_interface_back_refs()
+        vmi_back_refs = health_obj.get_virtual_machine_interface_back_refs()
         for vmi in vmi_back_refs or []:
             self._vnc_lib.ref_update('virtual-machine-interface', vmi['uuid'],
                 'service-health-check', health_obj.uuid, None, 'DELETE')
