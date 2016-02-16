@@ -1,0 +1,139 @@
+heat_template_version: 2013-05-23
+
+parameters:
+   vn_1_name:
+      type: string
+      label: Name for Network 1
+      description: Web tier network name
+   vn_1_fq_name:
+      type: string
+      label: FQ Name for Network 1
+      description: Web tier network name
+   vn_1_cidr:
+      type: string
+      label: Address block for Network 1 (CIDR notation)
+      description: Web tier network block (CIDR notation)
+   vn_2_name:
+      type: string
+      label: Name for Network 2
+      description: Db tier network name
+   vn_2_fq_name:
+      type: string
+      label: FQ Name for Network 2
+      description: Web tier network name
+   vn_2_cidr:
+      type: string
+      label: Address block for Network 2 (CIDR notation)
+      description: Db tier network block (CIDR notation)
+   policy_name:
+      type: string
+      label: Policy Name (to connect Network 1 and Network 2)
+      description: Policy name to connect Web and Db Tiers
+   policy_direction:
+      type: string
+      label: Policy Direction (< , > , <>)
+      description: Direction to apply policy
+
+resources:
+   net1:
+      type: "OS::Contrail::VirtualNetwork"
+      properties:
+         name: { get_param: vn_1_name } 
+         network_policy_refs: { get_resource: policy_web_db }
+         network_policy_refs_data:
+           {
+             network_policy_refs_data_sequence:
+               {
+                 network_policy_refs_data_sequence_major: 0,
+                 network_policy_refs_data_sequence_minor: 0,
+               },
+           }
+ 
+   net1-subnet1:
+      type: "OS::Neutron::Subnet"
+      properties:
+         cidr: { get_param: vn_1_cidr }
+         name: { get_resource: net1 }
+         enable_dhcp: true
+         network_id: { get_resource: net1 }
+
+   net2:
+      type: "OS::Contrail::VirtualNetwork"
+      properties:
+         name: { get_param: vn_2_name }
+         network_policy_refs: { get_resource: policy_web_db }
+         network_policy_refs_data:
+           {
+             network_policy_refs_data_sequence:
+               {
+                 network_policy_refs_data_sequence_major: 0,
+                 network_policy_refs_data_sequence_minor: 0,
+               },
+           }
+
+   net2-subnet1:
+      type: "OS::Neutron::Subnet"
+      properties:
+         cidr: { get_param: vn_2_cidr }
+         name: { get_resource: net2 }
+         enable_dhcp: true
+         network_id: { get_resource: net2 }
+
+   host1_port0:
+      type: "OS::Neutron::Port"
+      properties:
+         network_id: { get_resource: net1 }
+
+   host2_port0:
+      type: "OS::Neutron::Port"
+      properties:
+         network_id: { get_resource: net2 }
+
+   host1:
+      type: "OS::Nova::Server"
+      properties:
+         name: host1
+         image: ubuntu
+         flavor: m1.medium
+         networks:
+           - port: { get_resource: host1_port0 }
+
+   host2:
+      type: "OS::Nova::Server"
+      properties:
+         name: host2
+         image: ubuntu
+         flavor: m1.medium
+         networks:
+           - port: { get_resource: host2_port0 }
+
+   policy_web_db:
+      type: OS::Contrail::NetworkPolicy
+      properties:
+         name: { get_param: policy_name }
+         network_policy_entries:
+            network_policy_entries_policy_rule: [
+               {
+                  network_policy_entries_policy_rule_direction: { get_param: policy_direction },
+                  network_policy_entries_policy_rule_protocol: "any",
+		  network_policy_entries_policy_rule_dst_addresses:
+                    [{
+                      network_policy_entries_policy_rule_dst_addresses_virtual_network: { get_param: vn_1_fq_name },
+                    }],
+		  network_policy_entries_policy_rule_src_addresses:
+                    [{
+                      network_policy_entries_policy_rule_src_addresses_virtual_network: { get_param: vn_2_fq_name },
+                    }],
+                  network_policy_entries_policy_rule_src_ports:
+                    [{
+                      network_policy_entries_policy_rule_src_ports_start_port: "-1",
+                      network_policy_entries_policy_rule_src_ports_end_port: "-1"
+                    }],
+                  network_policy_entries_policy_rule_dst_ports:
+                    [{
+                      network_policy_entries_policy_rule_dst_ports_start_port: "-1",
+                      network_policy_entries_policy_rule_dst_ports_end_port: "-1"
+                    }],
+                  network_policy_entries_policy_rule_action_list: { network_policy_entries_policy_rule_action_list_simple_action: "pass" },
+               }
+            ]
