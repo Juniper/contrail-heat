@@ -126,11 +126,6 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             vn_obj.set_flood_unknown_unicast(True)
         else:
             vn_obj.set_flood_unknown_unicast(False)
-        vn_uuid = self.vnc_lib().virtual_network_create(vn_obj)
-        if self.properties[self.FLOOD_UNKNOWN_UNICAST] == "True":
-            vn_obj.set_flood_unknown_unicast(True)
-        else:
-            vn_obj.set_flood_unknown_unicast(False)
         vn_uuid = super(ContrailVirtualNetwork, self).resource_create(vn_obj)
         self.resource_id_set(vn_uuid)
 
