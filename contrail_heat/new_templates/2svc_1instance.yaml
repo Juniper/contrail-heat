@@ -683,7 +683,7 @@ resources:
 		network_policy_entries_policy_rule_action_list: { 
 			network_policy_entries_policy_rule_action_list_simple_action: { get_param: simple_action },
 			network_policy_entries_policy_rule_action_list_apply_service: 
-									[[{ get_param: service_instance1_fq_name }]]
+									[{ get_param: service_instance1_fq_name }]
 								},
 									}]
 	}
@@ -712,7 +712,7 @@ resources:
 		network_policy_entries_policy_rule_action_list: { 
 			network_policy_entries_policy_rule_action_list_simple_action: { get_param: simple_action },
 			network_policy_entries_policy_rule_action_list_apply_service: 
-									[[{ get_param: service_instance2_fq_name }]]
+									[{ get_param: service_instance2_fq_name }]
 								},
 									}]
 	}
