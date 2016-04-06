@@ -111,7 +111,10 @@ parameters:
   service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode_3:
     type: string
     description: address_mode for the ServiceInstance
-  
+  service_instance_properties_ha_mode:
+    type: string
+    description: HA Mode of the Service Instance
+ 
   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
     type: string
     description: subnet prefix for mgmt network
@@ -360,7 +363,8 @@ resources:
                 },
               }
             ],
-        }
+       service_instance_properties_ha_mode: { get_param: service_instance_properties_ha_mode } 
+	}
       service_template_refs: { get_resource: template_ServiceTemplate }
 
   template_PortTuple1:
