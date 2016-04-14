@@ -47,13 +47,13 @@ parameters:
 
 resources:
   template_PortTuple:
-    type: OS::Contrail::PortTuple
+    type: OS::ContrailV2::PortTuple
     properties:
       name: { get_param: port_tuple_name }
       service_instance: { get_param: service_instance_name }
 
   template_VirtualMachineInterface_1:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple ]
     properties:
       name: { get_param: virtual_network_1 }
@@ -61,11 +61,11 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_interface_type_1 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple }
-      virtual_network_refs: { get_param: virtual_network_1_fqdn }
+      port_tuple_refs: [{ get_resource: template_PortTuple }]
+      virtual_network_refs: [{ get_param: virtual_network_1_fqdn }]
 
   template_VirtualMachineInterface_2:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple ]
     properties:
       name: { get_param: virtual_network_2 }
@@ -73,11 +73,11 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_interface_type_2 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple }
-      virtual_network_refs: { get_param: virtual_network_2_fqdn }
+      port_tuple_refs: [{ get_resource: template_PortTuple }]
+      virtual_network_refs: [{ get_param: virtual_network_2_fqdn }]
 
   template_VirtualMachineInterface_3:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple ]
     properties:
       name: { get_param: virtual_network_3 }
@@ -85,32 +85,32 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_interface_type_3 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple }
-      virtual_network_refs: { get_param: virtual_network_3_fqdn }
+      port_tuple_refs: [{ get_resource: template_PortTuple }]
+      virtual_network_refs: [{ get_param: virtual_network_3_fqdn }]
 
   template_InstanceIp_1:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_1 ]
     properties:
       name: { get_param: virtual_network_1 }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_1 }
-      virtual_network_refs: { get_param: virtual_network_1_fqdn }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_1 }]
+      virtual_network_refs: [{ get_param: virtual_network_1_fqdn }]
 
   template_InstanceIp_2:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_2 ]
     properties:
       name: { get_param: virtual_network_2 }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_2 }
-      virtual_network_refs: { get_param: virtual_network_2_fqdn }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_2 }]
+      virtual_network_refs: [{ get_param: virtual_network_2_fqdn }]
 
   template_InstanceIp_3:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_3 ]
     properties:
       name: { get_param: virtual_network_3 }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_3 }
-      virtual_network_refs: { get_param: virtual_network_3_fqdn }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_3 }]
+      virtual_network_refs: [{ get_param: virtual_network_3_fqdn }]
 
   instance:
     type: OS::Nova::Server

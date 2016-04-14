@@ -32,12 +32,12 @@ parameters:
 
 resources:
   template_NetworkIpam_1:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: private_net_1_name }
 
   template_VirtualNetwork_1:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_1 ]
     properties:
       name: { get_param: private_net_1_name }

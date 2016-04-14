@@ -154,28 +154,28 @@ parameters:
 
 resources:
   template_NetworkIpam_1:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: management_network }
 
   template_NetworkIpam_2:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: left_network }
 
   template_NetworkIpam_3:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: right_network }
 
   template_VirtualNetwork_1:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_1 ]
     properties:
       name: { get_param: management_network }
-      network_ipam_refs: { get_resource: template_NetworkIpam_1 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_1 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -184,16 +184,16 @@ resources:
                   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_1 },
                 },
             }]
-         }
+         }]
 
   template_VirtualNetwork_2:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_2 ]
     properties:
       name: { get_param: left_network }
-      network_ipam_refs: { get_resource: template_NetworkIpam_2 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_2 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -202,16 +202,16 @@ resources:
                   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_2 },
                 },
             }]
-         }
+         }]
 
   template_VirtualNetwork_3:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_3 ]
     properties:
       name: { get_param: right_network }
-      network_ipam_refs: { get_resource: template_NetworkIpam_3 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_3 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -220,10 +220,10 @@ resources:
                   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_3 },
                 },
             }]
-         }
+         }]
 
   template_ServiceTemplate:
-    type: OS::Contrail::ServiceTemplate
+    type: OS::ContrailV2::ServiceTemplate
     properties:
       name: { get_param: service_template_name }
       service_template_properties:
@@ -259,7 +259,7 @@ resources:
       domain: { get_param: domain }
 
   template_ServiceInstance:
-    type: OS::Contrail::ServiceInstance
+    type: OS::ContrailV2::ServiceInstance
     depends_on: [ template_ServiceTemplate ]
     properties:
       name: { get_param: service_instance_name }
@@ -311,7 +311,7 @@ resources:
               }
             ],
         }
-      service_template_refs: { get_resource: template_ServiceTemplate }
+      service_template_refs: [{ get_resource: template_ServiceTemplate }]
 
   instance_group:
     type: OS::Heat::AutoScalingGroup
