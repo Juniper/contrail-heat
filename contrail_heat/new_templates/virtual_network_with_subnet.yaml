@@ -29,12 +29,12 @@ parameters:
 
 resources:
   template_NetworkIpam_1:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: private_net_1_name }
 
   template_VirtualNetwork_1:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_1 ]
     properties:
       name: { get_param: private_net_1_name }
@@ -47,9 +47,9 @@ resources:
         {
           route_target_list_route_target: [{ get_param: route_target_1 }, { get_param: route_target_2 }],
         }
-      network_ipam_refs: { get_resource: template_NetworkIpam_1 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_1 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -58,5 +58,5 @@ resources:
                   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: private_net_1_prefix_len },
                 },
             }]
-         }
+         }]
 
