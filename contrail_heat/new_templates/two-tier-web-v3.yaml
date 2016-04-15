@@ -36,18 +36,18 @@ parameters:
 
 resources:
    net1:
-      type: "OS::Contrail::VirtualNetwork"
+      type: "OS::ContrailV2::VirtualNetwork"
       properties:
          name: { get_param: vn_1_name } 
-         network_policy_refs: { get_resource: policy_web_db }
+         network_policy_refs: [{ get_resource: policy_web_db }]
          network_policy_refs_data:
-           {
+           [{
              network_policy_refs_data_sequence:
                {
                  network_policy_refs_data_sequence_major: 0,
                  network_policy_refs_data_sequence_minor: 0,
                },
-           }
+           }]
  
    net1-subnet1:
       type: "OS::Neutron::Subnet"
@@ -58,18 +58,18 @@ resources:
          network_id: { get_resource: net1 }
 
    net2:
-      type: "OS::Contrail::VirtualNetwork"
+      type: "OS::ContrailV2::VirtualNetwork"
       properties:
          name: { get_param: vn_2_name }
-         network_policy_refs: { get_resource: policy_web_db }
+         network_policy_refs: [{ get_resource: policy_web_db }]
          network_policy_refs_data:
-           {
+           [{
              network_policy_refs_data_sequence:
                {
                  network_policy_refs_data_sequence_major: 0,
                  network_policy_refs_data_sequence_minor: 0,
                },
-           }
+           }]
 
    net2-subnet1:
       type: "OS::Neutron::Subnet"
@@ -108,7 +108,7 @@ resources:
            - port: { get_resource: host2_port0 }
 
    policy_web_db:
-      type: OS::Contrail::NetworkPolicy
+      type: OS::ContrailV2::NetworkPolicy
       properties:
          name: { get_param: policy_name }
          network_policy_entries:

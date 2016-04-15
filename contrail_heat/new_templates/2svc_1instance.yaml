@@ -206,38 +206,38 @@ parameters:
 
 resources:
   template_NetworkIpam_1:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: management_network }
 
   template_NetworkIpam_2:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: left_vn1 }
 
   template_NetworkIpam_3:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: right_vn1 }
 
   template_NetworkIpam_4:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: left_vn2 }
 
   template_NetworkIpam_5:
-    type: OS::Contrail::NetworkIpam
+    type: OS::ContrailV2::NetworkIpam
     properties:
       name: { get_param: right_vn2 }
 
   template_VirtualNetwork_1:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_1 ]
     properties:
       name: { get_param: management_network }
-      network_ipam_refs: { get_resource: template_NetworkIpam_1 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_1 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -247,16 +247,16 @@ resources:
                 },
 	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: network_ipam_refs_data_ipam_subnets_addr_from_start_true },
             }]
-         }
+         }]
 
   template_VirtualNetwork_2:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_2, template_NetworkPolicy1 ]
     properties:
       name: { get_param: left_vn1 }
-      network_ipam_refs: { get_resource: template_NetworkIpam_2 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_2 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -266,25 +266,25 @@ resources:
                 },
                network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: network_ipam_refs_data_ipam_subnets_addr_from_start_true },
  	     }]
-	 }
-      network_policy_refs: { get_param: policy1_fq_name }
+	 }]
+      network_policy_refs: [{ get_param: policy1_fq_name }]
       network_policy_refs_data:
-        {
+        [{
           network_policy_refs_data_sequence:
             {
               network_policy_refs_data_sequence_major: 0,
               network_policy_refs_data_sequence_minor: 0,
             },
-        }
+        }]
         
   template_VirtualNetwork_3:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_3, template_NetworkPolicy1 ]
     properties:
       name: { get_param: right_vn1 }
-      network_ipam_refs: { get_resource: template_NetworkIpam_3 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_3 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -294,24 +294,24 @@ resources:
                 },
 	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: network_ipam_refs_data_ipam_subnets_addr_from_start_true },
             }]
-         }
-      network_policy_refs: { get_param: policy1_fq_name }
+         }]
+      network_policy_refs: [{ get_param: policy1_fq_name }]
       network_policy_refs_data:
-        {
+        [{
           network_policy_refs_data_sequence:
             {
               network_policy_refs_data_sequence_major: 0,
               network_policy_refs_data_sequence_minor: 0,
             },
-        }
+        }]
   template_VirtualNetwork_4:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_4, template_NetworkPolicy2 ]
     properties:
       name: { get_param: left_vn2 }
-      network_ipam_refs: { get_resource: template_NetworkIpam_4 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_4 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -321,25 +321,25 @@ resources:
                 },
                network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: network_ipam_refs_data_ipam_subnets_addr_from_start_true },
  	     }]
-	 }
-      network_policy_refs: { get_param: policy2_fq_name }
+	 }]
+      network_policy_refs: [{ get_param: policy2_fq_name }]
       network_policy_refs_data:
-        {
+        [{
           network_policy_refs_data_sequence:
             {
               network_policy_refs_data_sequence_major: 0,
               network_policy_refs_data_sequence_minor: 0,
             },
-        }
+        }]
         
   template_VirtualNetwork_5:
-    type: OS::Contrail::VirtualNetwork
+    type: OS::ContrailV2::VirtualNetwork
     depends_on: [ template_NetworkIpam_5, template_NetworkPolicy2 ]
     properties:
       name: { get_param: right_vn2 }
-      network_ipam_refs: { get_resource: template_NetworkIpam_5 }
+      network_ipam_refs: [{ get_resource: template_NetworkIpam_5 }]
       network_ipam_refs_data:
-        {
+        [{
           network_ipam_refs_data_ipam_subnets:
             [{
               network_ipam_refs_data_ipam_subnets_subnet:
@@ -349,19 +349,19 @@ resources:
                 },
 	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: network_ipam_refs_data_ipam_subnets_addr_from_start_true },
             }]
-         }
-      network_policy_refs: { get_param: policy2_fq_name }
+         }]
+      network_policy_refs: [{ get_param: policy2_fq_name }]
       network_policy_refs_data:
-        {
+        [{
           network_policy_refs_data_sequence:
             {
               network_policy_refs_data_sequence_major: 0,
               network_policy_refs_data_sequence_minor: 0,
             },
-        }
+        }]
 
   template_ServiceTemplate:
-    type: OS::Contrail::ServiceTemplate
+    type: OS::ContrailV2::ServiceTemplate
     properties:
       name: { get_param: service_template_name }
       service_template_properties:
@@ -392,7 +392,7 @@ resources:
       domain: { get_param: domain }
 
   template_ServiceInstance1:
-    type: OS::Contrail::ServiceInstance
+    type: OS::ContrailV2::ServiceInstance
     depends_on: [ template_ServiceTemplate ]
     properties:
       name: { get_param: service_instance1_name }
@@ -414,10 +414,10 @@ resources:
               }
             ],
         }
-      service_template_refs: { get_resource: template_ServiceTemplate }
+      service_template_refs: [{ get_resource: template_ServiceTemplate }]
   
   template_ServiceInstance2:
-    type: OS::Contrail::ServiceInstance
+    type: OS::ContrailV2::ServiceInstance
     depends_on: [ template_ServiceTemplate ]
     properties:
       name: { get_param: service_instance2_name }
@@ -439,30 +439,30 @@ resources:
               }
             ],
         }
-      service_template_refs: { get_resource: template_ServiceTemplate }
+      service_template_refs: [{ get_resource: template_ServiceTemplate }]
 
   template_PortTuple1:
-    type: OS::Contrail::PortTuple
+    type: OS::ContrailV2::PortTuple
     depends_on: [ template_ServiceInstance1 ]
     properties:
       name: { get_attr: [ random_key_1, value ] }
       service_instance: { list_join: [':', { get_attr: [ template_ServiceInstance1, fq_name ] } ] }
   
   template_PortTuple2:
-    type: OS::Contrail::PortTuple
+    type: OS::ContrailV2::PortTuple
     depends_on: [ template_ServiceInstance2 ]
     properties:
       name: { get_attr: [ random_key_2, value ] }
       service_instance: { list_join: [':', { get_attr: [ template_ServiceInstance2, fq_name ] } ] }
 
   template_VirtualMachineInterface_1:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     properties:
       name: { get_attr: [ random_key_1, value ] }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }]
   
   template_VirtualMachineInterface_2:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple1 ]
     properties:
       name: { get_attr: [ random_key_2, value ] }
@@ -470,11 +470,11 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_2 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple1 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }
+      port_tuple_refs: [{ get_resource: template_PortTuple1 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
   template_VirtualMachineInterface_3:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple1 ]
     properties:
       name: { get_attr: [ random_key_3, value ] }
@@ -482,11 +482,11 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_3 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple1 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }
+      port_tuple_refs: [{ get_resource: template_PortTuple1 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
   template_VirtualMachineInterface_4:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple2 ]
     properties:
       name: { get_attr: [ random_key_2, value ] }
@@ -494,11 +494,11 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_2 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple2 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }
+      port_tuple_refs: [{ get_resource: template_PortTuple2 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }]
 
   template_VirtualMachineInterface_5:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple2 ]
     properties:
       name: { get_attr: [ random_key_3, value ] }
@@ -506,80 +506,80 @@ resources:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_3 },
         }
-      port_tuple_refs: { get_resource: template_PortTuple2 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }
+      port_tuple_refs: [{ get_resource: template_PortTuple2 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }]
 
   template_InstanceIp_1:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_1, template_VirtualNetwork_1 ]
     properties:
       name: { get_attr: [ random_key_1, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_1 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_1 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }]
 
   template_InstanceIp_2:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_2, template_VirtualNetwork_2 ]
     properties:
       name: { get_attr: [ random_key_2, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_2 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_2 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
   template_InstanceIp_3:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_3, template_VirtualNetwork_3 ]
     properties:
       name: { get_attr: [ random_key_3, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_3 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_3 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
   template_InstanceIp_4:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_4, template_VirtualNetwork_4 ]
     properties:
       name: { get_attr: [ random_key_4, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_4 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_4 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }]
 
   template_InstanceIp_5:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_5, template_VirtualNetwork_5 ]
     properties:
       name: { get_attr: [ random_key_5, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_5 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_5 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }]
 
   template_InstanceIp_6:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_6, template_VirtualNetwork_2 ]
     properties:
       name: { get_attr: [ random_key_2, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_6 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_6 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
   template_InstanceIp_7:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_7, template_VirtualNetwork_3 ]
     properties:
       name: { get_attr: [ random_key_3, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_7 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_7 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
   template_InstanceIp_8:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_8, template_VirtualNetwork_4 ]
     properties:
       name: { get_attr: [ random_key_4, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_8 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_8 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }]
 
   template_InstanceIp_9:
-    type: OS::Contrail::InstanceIp
+    type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_9, template_VirtualNetwork_5 ]
     properties:
       name: { get_attr: [ random_key_5, value ] }
-      virtual_machine_interface_refs: { get_resource: template_VirtualMachineInterface_9 }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }
+      virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_9 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }]
 
   instance:
     type: OS::Nova::Server
@@ -596,28 +596,28 @@ resources:
         - port: { get_resource: template_VirtualMachineInterface_5 }
 
   template_VirtualMachineInterface_6:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     properties:
       name: { get_param: left_vm1_name }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
   
   template_VirtualMachineInterface_7:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     properties:
       name: { get_param: right_vm1_name }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
  
   template_VirtualMachineInterface_8:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     properties:
       name: { get_param: left_vm2_name }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }]
   
   template_VirtualMachineInterface_9:
-    type: OS::Contrail::VirtualMachineInterface
+    type: OS::ContrailV2::VirtualMachineInterface
     properties:
       name: { get_param: right_vm2_name }
-      virtual_network_refs: { list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }]
  
   template_leftVM1:
     type: OS::Nova::Server
@@ -660,7 +660,7 @@ resources:
         - port: { get_resource: template_VirtualMachineInterface_9 }
 
   template_NetworkPolicy1:
-    type: OS::Contrail::NetworkPolicy
+    type: OS::ContrailV2::NetworkPolicy
     properties:
       name: { get_param: policy1_name }
       network_policy_entries: { network_policy_entries_policy_rule: [{ 
@@ -689,7 +689,7 @@ resources:
 	}
 
   template_NetworkPolicy2:
-    type: OS::Contrail::NetworkPolicy
+    type: OS::ContrailV2::NetworkPolicy
     properties:
       name: { get_param: policy2_name }
       network_policy_entries: { network_policy_entries_policy_rule: [{ 
