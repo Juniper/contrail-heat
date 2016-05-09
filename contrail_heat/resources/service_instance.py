@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import constraints
 from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
@@ -169,15 +170,30 @@ class HeatServiceInstance(ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Service Instance."),
-        "fq_name": _("The FQ name of the Service Instance."),
-        "status": _("Status of the Service Instance."),
-        "service_template": _("Service Template of the Service Instance."),
-        "virtual_machines": _("Service VMs for the Service Instance."),
-        "active_service_vms": _("Number of service VMs active for this "
-                                "Service Instance."),
-        "tenant_id": _("Tenant id of the Service Instance."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Service Instance.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Service Instance.'),
+        ),
+        "status": attributes.Schema(
+            _('Status of the Service Instance.'),
+        ),
+        "service_template": attributes.Schema(
+            _('Service Template of the Service Instance.'),
+        ),
+        "virtual_machines": attributes.Schema(
+            _('Service VMs for the Service Instance.'),
+        ),
+        "active_service_vms": attributes.Schema(
+            _('Number of service VMs active for this Service Instance.'),
+        ),
+        "tenant_id": attributes.Schema(
+            _('Tenant id of the Service Instance.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     update_allowed_keys = ('Properties',)

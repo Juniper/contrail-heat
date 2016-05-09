@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import constraints
 from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
@@ -104,20 +105,48 @@ class HeatServiceHealthCheck(ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Service Health Check."),
-        "fq_name": _("The FQ name of the Service Health Check."),
-        "service_instance": _("Service Instance for the Service Health Check."),
-        "service_port_tag": _("Tag for attaching to the corresponding port."),
-        "monitor_type": _("Monitor type of http or ping."),
-        "delay": _("Delay between health checks."),
-        "timeout": _("Timeout wait for response."),
-        "max_retries": _("Max retries for health check."),
-        "http_method": _("HTTP method for health check."),
-        "url_path": _("URL path for health HTTP health check."),
-        "expected_codes": _("Expected HTTP codes."),
-        "enabled": _("Health check enabled."),
-        "tenant_id": _("Tenant id of the Service Instance."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Service Health Check.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Service Health Check.'),
+        ),
+        "service_instance": attributes.Schema(
+            _('Service Instance for the Service Health Check.'),
+        ),
+        "service_port_tag": attributes.Schema(
+            _('Tag for attaching to the corresponding port.'),
+        ),
+        "monitor_type": attributes.Schema(
+            _('Monitor type of http or ping.'),
+        ),
+        "delay": attributes.Schema(
+            _('Delay between health checks.'),
+        ),
+        "timeout": attributes.Schema(
+            _('Timeout wait for response.'),
+        ),
+        "max_retries": attributes.Schema(
+            _('Max retries for health check.'),
+        ),
+        "http_method": attributes.Schema(
+            _('HTTP method for health check.'),
+        ),
+        "url_path": attributes.Schema(
+            _('URL path for health HTTP health check.'),
+        ),
+        "expected_codes": attributes.Schema(
+            _('Expected HTTP codes.'),
+        ),
+        "enabled": attributes.Schema(
+            _('Health check enabled.'),
+        ),
+        "tenant_id": attributes.Schema(
+            _('Tenant id of the Service Instance.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     update_allowed_keys = ('Properties',)

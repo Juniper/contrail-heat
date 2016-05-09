@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import constraints
 from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
@@ -46,12 +47,24 @@ class HeatPortTuple(ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Port Tuple."),
-        "fq_name": _("The FQ name of the Port Tuple."),
-        "service_instance": _("Service Instance for the Port Tuple."),
-        "ports": _("Service interfaces for the Port Tuple."),
-        "tenant_id": _("Tenant id of the Service Instance."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Port Tuple.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Port Tuple.'),
+        ),
+        "service_instance": attributes.Schema(
+            _('Service Instance for the Port Tuple.'),
+        ),
+        "ports": attributes.Schema(
+            _('Service interfaces for the Port Tuple.'),
+        ),
+        "tenant_id": attributes.Schema(
+            _('Tenant id of the Service Instance.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     update_allowed_keys = ('Properties',)
