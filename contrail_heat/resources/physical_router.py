@@ -3,6 +3,7 @@ try:
 except ImportError:
     pass
 
+from heat.engine import attributes
 from heat.engine import properties
 from vnc_api import vnc_api
 from contrail_heat.resources import contrail
@@ -25,10 +26,18 @@ class HeatPhysicalRouter(contrail.ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Physical Router."),
-        "fq_name": _("The FQ name of the Physical Router."),
-        "physical_interfaces": _("List of Physical Interfaces attached."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Physical Router.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Physical Router.'),
+        ),
+        "physical_interfaces": attributes.Schema(
+            _('List of Physical Interfaces attached.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     def handle_create(self):

@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import properties
 from vnc_api import vnc_api
 from contrail_heat.resources import contrail
@@ -25,9 +26,15 @@ class HeatNetworkIpam(contrail.ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Network IPAM."),
-        "fq_name": _("The FQ name of the Network IPAM."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Network IPAM..'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Network IPAM.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     def handle_create(self):

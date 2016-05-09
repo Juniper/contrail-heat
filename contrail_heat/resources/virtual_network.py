@@ -5,6 +5,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import constraints
 from heat.engine import properties
 try:
@@ -86,15 +87,33 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         ),
     }
     attributes_schema = {
-        "name": _("The name of the Virtual Network."),
-        "fq_name": _("The FQ name of the Virtual Network."),
-        "route_targets": _("Route Targets list."),
-        "shared": _("shared across all tenants."),
-        "external": _("external."),
-        "allow_transit": _("allow_transit."),
-        "forwarding_mode": _("forwarding_mode."),
-        "flood_unknown_unicast":_("L2 packets flooded to all ports on network."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Virtual Network.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Virtual Network.'),
+        ),
+        "route_targets": attributes.Schema(
+            _('Route Targets list.'),
+        ),
+        "shared": attributes.Schema(
+            _('shared across all tenants.'),
+        ),
+        "external": attributes.Schema(
+            _('external.'),
+        ),
+        "allow_transit": attributes.Schema(
+            _('allow_transit.'),
+        ),
+        "forwarding_mode": attributes.Schema(
+            _('forwarding_mode.'),
+        ),
+        "flood_unknown_unicast": attributes.Schema(
+            _('L2 packets flooded to all ports on network.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     update_allowed_keys = ('Properties',)

@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import constraints
 from heat.engine import properties
 from vnc_api import vnc_api
@@ -116,16 +117,33 @@ class HeatVnSubnet(contrail.ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Virtual Network."),
-        "network": _("Network ID this subnet belongs to."),
-        "ip_prefix": _("IP prefix of subnet."),
-        "default_gateway": _("Default gateway of subnet."),
-        "ipam": _("IPAM this subnet uses."),
-        "subnet_uuid": _("UUID of subnet."),
-        "subnet_name": _("Name of subnet"),
-        "enable_dhcp": _("'True' if DHCP is enabled for this subnet; 'False' "
-                         "otherwise."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Virtual Network.'),
+        ),
+        "network": attributes.Schema(
+            _('Network ID this subnet belongs to.'),
+        ),
+        "ip_prefix": attributes.Schema(
+            _('IP prefix of subnet.'),
+        ),
+        "default_gateway": attributes.Schema(
+            _('Default gateway of subnet.'),
+        ),
+        "ipam": attributes.Schema(
+            _('IPAM this subnet uses.'),
+        ),
+        "subnet_uuid": attributes.Schema(
+            _('UUID of subnet.'),
+        ),
+        "subnet_name": attributes.Schema(
+            _('Name of subnet.'),
+        ),
+        "enable_dhcp": attributes.Schema(
+            _('True if DHCP is enabled for this subnet; False otherwise.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     update_allowed_keys = ('Properties',)
