@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import constraints
 from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
@@ -52,13 +53,27 @@ class HeatRouteTable(ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Route Table."),
-        "fq_name": _("The FQ name of the Route Table."),
-        "service_instance": _("Service Instance for the Route Table."),
-        "service_port_tag": _("Tag for attaching to the corresponding port."),
-        "routes": _("List of static routes."),
-        "tenant_id": _("Tenant id of the Service Instance."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Route Table.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Route Table.'),
+        ),
+        "service_instance": attributes.Schema(
+            _('Service Instance for the Route Table.'),
+        ),
+        "service_port_tag": attributes.Schema(
+            _('Tag for attaching to the corresponding port.'),
+        ),
+        "routes": attributes.Schema(
+            _('List of static routes.'),
+        ),
+        "tenant_id": attributes.Schema(
+            _('Tenant id of the Service Instance.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     update_allowed_keys = ('Properties',)

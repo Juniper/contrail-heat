@@ -2,6 +2,7 @@ try:
     from heat.common.i18n import _
 except ImportError:
     pass
+from heat.engine import attributes
 from heat.engine import properties
 from heat.engine import constraints
 from vnc_api import vnc_api
@@ -51,13 +52,27 @@ class HeatVirtualMachineInterface(contrail.ContrailResource):
     }
 
     attributes_schema = {
-        "name": _("The name of the Virtual Network."),
-        "fq_name": _("The FQ name of the Virtual Network."),
-        "service_interface_type": _("Service interface type."),
-        "virtual_machine_interface_mac_addresses": _("List of mac addresses."),
-        "virtual_networks": _("List of virtual networks FQ names."),
-        "port_tuples": _("List of port tuple FQ names."),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the Virtual Network.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('The FQ name of the Virtual Network.'),
+        ),
+        "service_interface_type": attributes.Schema(
+            _('Service interface type.'),
+        ),
+        "virtual_machine_interface_mac_addresses": attributes.Schema(
+            _('List of mac addresses.'),
+        ),
+        "virtual_networks": attributes.Schema(
+            _('List of virtual networks FQ names.'),
+        ),
+        "port_tuples": attributes.Schema(
+            _('List of port tuple FQ names.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     def _get_iip_name(self, pt_obj, vmi_obj, iip_family):

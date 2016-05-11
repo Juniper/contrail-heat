@@ -3,6 +3,7 @@ try:
 except ImportError:
     pass
 
+from heat.engine import attributes
 from heat.engine import constraints
 from heat.engine import clients
 from heat.engine import properties
@@ -161,11 +162,21 @@ class NetworkPolicy(ContrailResource):
         )
     }
     attributes_schema = {
-        "name": _("The name of the policy."),
-        "fq_name": _("FQ name of this policy."),
-        "tenant_id": _("The tenant owning this network."),
-        "rules": _("List of rules"),
-        "show": _("All attributes."),
+        "name": attributes.Schema(
+            _('The name of the policy.'),
+        ),
+        "fq_name": attributes.Schema(
+            _('FQ name of this policy.'),
+        ),
+        "tenant_id": attributes.Schema(
+            _('The tenant owning this network.'),
+        ),
+        "rules": attributes.Schema(
+            _('List of rules.'),
+        ),
+        "show": attributes.Schema(
+            _('All attributes.'),
+        ),
     }
 
     def fix_apply_service(self, props):
