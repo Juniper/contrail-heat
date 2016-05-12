@@ -144,9 +144,9 @@ class HeatServiceTemplate(ContrailResource):
             properties.Schema.STRING,
             _('Indicates version for the template'),
             constraints=[
-                constraints.AllowedValues([2]),
+                constraints.AllowedValues([1, 2]),
             ],
-            default='2',
+            default='1',
             update_allowed=False
         ),
     }
