@@ -230,15 +230,12 @@ class HeatServiceInstance(ContrailResource):
         si_prop = si_obj.get_service_instance_properties()
 
         svc_tmpl_if_list = st_obj.get_service_template_properties().interface_type
-        svc_inst_if_list = prop_diff.get(self.INTERFACE_LIST)
-        if len(svc_tmpl_if_list) != len(svc_inst_if_list):
-            raise vnc_api.BadRequest
+        svc_inst_if_list = si_obj.get_service_instance_properties().interface_list
 
         if_index = 0
-        if prop_diff.get(self.INTERFACE_LIST):
-            si_prop.set_interface_list([])
-        for intf in prop_diff.get(self.INTERFACE_LIST):
-            virt_net = intf[self.VIRTUAL_NETWORK]
+        si_prop.set_interface_list([])
+        for intf in svc_inst_if_list:
+            virt_net = intf.get_virtual_network()
             if virt_net == "auto":
                 vn_name = ""
             elif not ":" in virt_net:
