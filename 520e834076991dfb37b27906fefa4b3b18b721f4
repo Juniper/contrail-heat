@@ -1,0 +1,10 @@
+Approved+1: opencontrail-admin <ci-admin@opencontrail.org>
+Verified+2: opencontrail-admin <ci-admin@opencontrail.org>
+Verified+2: Zuul <zuul@lists.opencontrail.org>
+Approved+1: Karl Klashinsky <klash@juniper.net>
+Code-Review+2: Karl Klashinsky <klash@juniper.net>
+Submitted-by: Zuul <zuul@lists.opencontrail.org>
+Submitted-at: Fri, 13 May 2016 17:20:30 -0700
+Reviewed-on: https://review.opencontrail.org/20208
+Project: Juniper/contrail-heat
+Branch: refs/heads/R2.22.x
