@@ -169,6 +169,12 @@ parameters:
   right_vm2_name: 
     type: string
     description: Name of the right VM
+  pt1_name:
+    type: string
+    description: Name of the Port-Tuple
+  pt2_name:
+    type: string
+    description: Name of the Port-Tuple
 
   policy1_name:
     type: string
@@ -445,27 +451,25 @@ resources:
     type: OS::ContrailV2::PortTuple
     depends_on: [ template_ServiceInstance1 ]
     properties:
-      name: { get_attr: [ random_key_1, value ] }
+      name: { get_param: pt1_name }
       service_instance: { list_join: [':', { get_attr: [ template_ServiceInstance1, fq_name ] } ] }
   
   template_PortTuple2:
     type: OS::ContrailV2::PortTuple
     depends_on: [ template_ServiceInstance2 ]
     properties:
-      name: { get_attr: [ random_key_2, value ] }
+      name: { get_param: pt2_name }
       service_instance: { list_join: [':', { get_attr: [ template_ServiceInstance2, fq_name ] } ] }
 
   template_VirtualMachineInterface_1:
     type: OS::ContrailV2::VirtualMachineInterface
     properties:
-      name: { get_attr: [ random_key_1, value ] }
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }]
   
   template_VirtualMachineInterface_2:
     type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple1 ]
     properties:
-      name: { get_attr: [ random_key_2, value ] }
       virtual_machine_interface_properties:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_2 },
@@ -477,7 +481,6 @@ resources:
     type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple1 ]
     properties:
-      name: { get_attr: [ random_key_3, value ] }
       virtual_machine_interface_properties:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_3 },
@@ -489,7 +492,6 @@ resources:
     type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple2 ]
     properties:
-      name: { get_attr: [ random_key_2, value ] }
       virtual_machine_interface_properties:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_2 },
@@ -501,7 +503,6 @@ resources:
     type: OS::ContrailV2::VirtualMachineInterface
     depends_on: [ template_PortTuple2 ]
     properties:
-      name: { get_attr: [ random_key_3, value ] }
       virtual_machine_interface_properties:
         {
           virtual_machine_interface_properties_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_3 },
@@ -513,7 +514,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_1, template_VirtualNetwork_1 ]
     properties:
-      name: { get_attr: [ random_key_1, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_1 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }]
 
@@ -521,7 +521,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_2, template_VirtualNetwork_2 ]
     properties:
-      name: { get_attr: [ random_key_2, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_2 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
@@ -529,7 +528,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_3, template_VirtualNetwork_3 ]
     properties:
-      name: { get_attr: [ random_key_3, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_3 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
@@ -537,7 +535,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_4, template_VirtualNetwork_4 ]
     properties:
-      name: { get_attr: [ random_key_4, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_4 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }]
 
@@ -545,7 +542,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_5, template_VirtualNetwork_5 ]
     properties:
-      name: { get_attr: [ random_key_5, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_5 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }]
 
@@ -553,7 +549,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_6, template_VirtualNetwork_2 ]
     properties:
-      name: { get_attr: [ random_key_2, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_6 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
@@ -561,7 +556,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_7, template_VirtualNetwork_3 ]
     properties:
-      name: { get_attr: [ random_key_3, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_7 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
@@ -569,7 +563,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_8, template_VirtualNetwork_4 ]
     properties:
-      name: { get_attr: [ random_key_4, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_8 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_4, fq_name ] } ] }]
 
@@ -577,7 +570,6 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_9, template_VirtualNetwork_5 ]
     properties:
-      name: { get_attr: [ random_key_5, value ] }
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_9 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_5, fq_name ] } ] }]
 
@@ -683,7 +675,7 @@ resources:
 		network_policy_entries_policy_rule_action_list: { 
 			network_policy_entries_policy_rule_action_list_simple_action: { get_param: simple_action },
 			network_policy_entries_policy_rule_action_list_apply_service: 
-									[[{ get_param: service_instance1_fq_name }]]
+									[{ get_param: service_instance1_fq_name }]
 								},
 									}]
 	}
@@ -712,96 +704,7 @@ resources:
 		network_policy_entries_policy_rule_action_list: { 
 			network_policy_entries_policy_rule_action_list_simple_action: { get_param: simple_action },
 			network_policy_entries_policy_rule_action_list_apply_service: 
-									[[{ get_param: service_instance2_fq_name }]]
+									[{ get_param: service_instance2_fq_name }]
 								},
 									}]
 	}
-
-  random_key_1:
-     type: OS::Heat::RandomString
-     properties:
-       length: 16
-
-  random_key_2:
-     type: OS::Heat::RandomString
-     properties:
-       length: 16
-
-  random_key_3:
-     type: OS::Heat::RandomString
-     properties:
-       length: 16
-
-  random_key_4:
-     type: OS::Heat::RandomString
-     properties:
-       length: 16
-
-  random_key_5:
-     type: OS::Heat::RandomString
-     properties:
-       length: 16
-
-#  instance_group:
-#    type: OS::Heat::AutoScalingGroup
-#    properties:
-#      cooldown: 60
-#      desired_capacity: 3
-#      max_size: 5
-#      min_size: 1
-#      resource:
-#        type: service_instance.yaml
-#        properties:
-#          image: { get_param: service_template_properties_image_name }
-#          flavor: { get_param: service_template_properties_flavor }
-#          virtual_network_1: { get_param: management_network }
-#          virtual_network_1_fqdn: { list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }
-#          virtual_network_2: { get_param: left_vn }
-#          virtual_network_2_fqdn: { list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }
-#          virtual_network_3: { get_param: right_vn }
-#          virtual_network_3_fqdn: { list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }
-#          service_instance_name: { list_join: [':', { get_attr: [ template_ServiceInstance, fq_name ] } ] }
-#          service_interface_type_1: 'management'
-#          service_interface_type_2: 'left'
-#          service_interface_type_3: 'right'
-#
-#  scaleup_policy:
-#    type: OS::Heat::ScalingPolicy
-#    properties:
-#      adjustment_type: change_in_capacity
-#      auto_scaling_group_id: { get_resource: instance_group }
-#      cooldown: 60
-#      scaling_adjustment: 1
-#
-#  cpu_alarm_high:
-#    type: OS::Ceilometer::Alarm
-#    properties:
-#      meter_name: cpu_util
-#      statistic: avg
-#      period: 60
-#      evaluation_periods: 1
-#      threshold: 50
-#      alarm_actions:
-#        - {get_attr: [scaledown_policy, alarm_url]}
-#      comparison_operator: gt
-#
-#  scaledown_policy:
-#    type: OS::Heat::ScalingPolicy
-#    properties:
-#      adjustment_type: change_in_capacity
-#      auto_scaling_group_id: { get_resource: instance_group }
-#      cooldown: 60
-#      scaling_adjustment: -1
-#
-#  cpu_alarm_low:
-#    type: OS::Ceilometer::Alarm
-#    properties:
-#      meter_name: cpu_util
-#      statistic: avg
-#      period: 60
-#      evaluation_periods: 1
-#      threshold: 70
-#      alarm_actions:
-#        - {get_attr: [scaledown_policy, alarm_url]}
-#      comparison_operator: lt
-#
