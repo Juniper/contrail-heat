@@ -1,0 +1,9 @@
+Verified+2: opencontrail-admin <ci-admin@opencontrail.org>
+Verified+2: Zuul <zuul@lists.opencontrail.org>
+Approved+1: Rudra Rugge <rrugge@juniper.net>
+Code-Review+2: Rudra Rugge <rrugge@juniper.net>
+Submitted-by: Zuul <zuul@lists.opencontrail.org>
+Submitted-at: Wed, 25 May 2016 08:50:31 -0700
+Reviewed-on: https://review.opencontrail.org/20533
+Project: Juniper/contrail-heat
+Branch: refs/heads/master
