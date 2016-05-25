@@ -11,6 +11,7 @@ import netaddr
 import uuid
 
 
+# temp comment 
 class HeatVnSubnet(contrail.ContrailResource):
     PROPERTIES = (
         NAME, NETWORK, IP_PREFIX, DEFAULT_GATEWAY, IPAM,
