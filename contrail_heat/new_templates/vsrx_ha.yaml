@@ -1,0 +1,20 @@
+heat_template_version: 2015-04-30
+#heat_template_version: 2013-05-23
+
+description: >
+  HOT template for vSRX HA that modifies the port 
+
+parameters:
+  vm_name:
+    type: string
+    description: Name of vSRX HA service instance to be created
+  cluster_id:
+    type: number 
+    description: The cluster ID that you will be using for the vSRX.
+
+resources:
+  VSRX_HA:
+    type: OS::Contrail::VSRX_HA
+    properties:
+      vm_name: { get_param: vm_name }
+      cluster_id: { get_param: cluster_id }
