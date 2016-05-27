@@ -253,7 +253,8 @@ class HeatServiceInstance(ContrailResource):
         if_index = 0
         si_prop = vnc_api.ServiceInstanceType()
         for intf in self.properties[self.INTERFACE_LIST]:
-            virt_net = project_obj.get_fq_name_str() + ':' + intf[self.VIRTUAL_NETWORK]
+            #            virt_net = project_obj.get_fq_name_str() + ':' + intf[self.VIRTUAL_NETWORK]
+            virt_net = intf[self.VIRTUAL_NETWORK]
             if virt_net == "auto":
                 vn_name = ""
             elif not ":" in virt_net:
@@ -319,7 +320,13 @@ class HeatServiceInstance(ContrailResource):
         si_prop.set_scale_out(scale_out)
 
         # allowed address pairs
-        aaps = self._set_allowed_address_pairs(intf)
+        aapsprop = prop_diff.get(self.INTERFACE_LIST)
+        if aapsprop:
+            for intf in aapsprop:
+                aaps = self._set_allowed_address_pairs(intf)
+                if_type = vnc_api.ServiceInstanceInterfaceType(
+                    allowed_address_pairs=aaps)
+                si_prop.add_interface_list(if_type)
 
         si_obj.set_service_instance_properties(si_prop)
         self.vnc_lib().service_instance_update(si_obj)
