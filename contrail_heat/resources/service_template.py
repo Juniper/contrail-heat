@@ -189,8 +189,10 @@ class HeatServiceTemplate(ContrailResource):
         svc_properties.set_availability_zone_enable(self.properties[self.AVAILABILITY_ZONE_ENABLE])
         svc_properties.set_service_virtualization_type(
             self.properties[self.SERVICE_VIRT_TYPE])
-        svc_properties.set_ordered_interfaces(
-            self.properties[self.ORDERED_INTERFACES])
+        if self.properties[self.ORDERED_INTERFACES] == 'True':
+            svc_properties.set_ordered_interfaces(True)
+        else:
+            svc_properties.set_ordered_interfaces(False)
         svc_properties.set_version(int(self.properties[self.SERVICE_VERSION]))
         # set interface list
         itf_list = self.properties[self.SERVICE_INTERFACE_TYPE_LIST]
