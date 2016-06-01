@@ -1,0 +1,8 @@
+Approved+1: opencontrail-admin <ci-admin@opencontrail.org>
+Verified+2: Zuul <zuul@lists.opencontrail.org>
+Code-Review+2: Sunil Basker <sunilbasker@juniper.net>
+Submitted-by: Zuul <zuul@lists.opencontrail.org>
+Submitted-at: Tue, 31 May 2016 21:35:38 -0700
+Reviewed-on: https://review.opencontrail.org/20701
+Project: Juniper/contrail-heat
+Branch: refs/heads/master
