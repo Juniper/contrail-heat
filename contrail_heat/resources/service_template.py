@@ -186,7 +186,6 @@ class HeatServiceTemplate(ContrailResource):
             svc_properties.set_availability_zone_enable(False)
         svc_properties.set_service_mode(self.properties[self.SERVICE_MODE])
         svc_properties.set_service_type(self.properties[self.SERVICE_TYPE])
-        svc_properties.set_availability_zone_enable(self.properties[self.AVAILABILITY_ZONE_ENABLE])
         svc_properties.set_service_virtualization_type(
             self.properties[self.SERVICE_VIRT_TYPE])
         if self.properties[self.ORDERED_INTERFACES] == 'True':
