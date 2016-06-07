@@ -1,0 +1,80 @@
+heat_template_version: 2015-04-30
+
+description: >
+  HOT template to create a Alarm:
+
+parameters:
+  name:
+    type: string
+    description: name for the Alarm
+    # required: optional
+  fq_name:
+    type: string
+    description: fq_name for the Alarm
+    # required: optional
+  display_name:
+    type: string
+    description: Display name user configured string(name) that can be updated any time. Used as openstack name.
+    # operations: CRUD
+    # required: optional
+  alarm_severity:
+    type: number
+    description: Severity level for the alarm.
+    # operations: CRUD
+    # required: required
+  alarm_rules_rule_operation:
+    type: string
+    description: operation to compare operand1 and operand2
+    # operations: CRUD
+    # required: true
+  alarm_rules_rule_operand1:
+    type: string
+    description: UVE attribute specified in the dotted format. Example: NodeStatus.process_info.process_state
+    # operations: CRUD
+    # required: true
+  alarm_rules_rule_operand2:
+    type: string
+    description: UVE attribute or a json value to compare with the UVE attribute in operand1. null value can be specified to check if operand1 exists using the operator != or ==
+    # operations: CRUD
+    # required: true
+  alarm_rules_rule_vars:
+    type: string
+    description: List of UVE attributes that would be useful when the alarm is raised. For example, user may want to raise an alarm if the NodeStatus.process_info.process_state != PROCESS_STATE_RUNNING. But, it would be useful to know the process_name whose state != PROCESS_STATE_RUNNING. This UVE attribute which is neither part of operand1 nor operand2 may be specified in vars
+    # operations: CRUD
+    # required: optional
+  uve_keys:
+    type: string
+    description: List of UVE tables or UVE objects where this alarm config should be applied. For example, rules
+    # operations: CRUD
+    # required: required
+  global_system_config:
+    type: string
+    description: global_system_config for the Alarm
+    # required: optional
+  project:
+    type: string
+    description: project for the Alarm
+    # required: optional
+
+resources:
+  template_Alarm:
+    type: OS::ContrailV2::Alarm
+    properties:
+      name: { get_param: name }
+      fq_name: { get_param: fq_name }
+      display_name: { get_param: display_name }
+      alarm_severity: { get_param: alarm_severity }
+      alarm_rules:
+        {
+          alarm_rules_rule:
+            [{
+              alarm_rules_rule_operation: { get_param: alarm_rules_rule_operation },
+              alarm_rules_rule_operand1: { get_param: alarm_rules_rule_operand1 },
+              alarm_rules_rule_operand2: { get_param: alarm_rules_rule_operand2 },
+              alarm_rules_rule_vars: [{ get_param: alarm_rules_rule_vars }],
+            }],
+        }
+      uve_keys: { get_param: uve_keys }
+      global_system_config: { get_param: global_system_config }
+      project: { get_param: project }
+
