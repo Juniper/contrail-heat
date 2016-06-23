@@ -22,6 +22,7 @@ class ContrailResource(resource.Resource):
     _DEFAULT_API_PORT = '8082'
     _DEFAULT_BASE_URL = '/'
     _DEFAULT_AUTH_HOST = '127.0.0.1'
+    _DEFAULT_USE_SSL = False
 
     def __init__(self, name, json_snippet, stack):
         super(ContrailResource, self).__init__(name, json_snippet, stack)
@@ -55,6 +56,10 @@ class ContrailResource(resource.Resource):
                                             'clients_contrail',
                                             'auth_host_ip',
                                             self._DEFAULT_AUTH_HOST)
+        self._use_ssl = self._read_cfg(cfg_parser,
+                                       'clients_contrail',
+                                       'use_ssl',
+                                       self._DEFAULT_USE_SSL)
         self._vnc_lib = None
 
     @staticmethod
@@ -109,6 +114,7 @@ class ContrailResource(resource.Resource):
                                            self._api_server_ip,
                                            self._api_server_port,
                                            self._api_base_url,
+                                           api_server_use_ssl=self._use_ssl,
                                            auth_host=self._auth_host_ip)
         return self._vnc_lib
 
