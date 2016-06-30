@@ -17,7 +17,7 @@ except ImportError:
 import uuid
 import copy
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class NetworkPolicy(ContrailResource):
