@@ -13,7 +13,7 @@ try:
 except ImportError:
     from oslo_log import log as logging
 
-logger = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class AttachPolicy(ContrailResource):
