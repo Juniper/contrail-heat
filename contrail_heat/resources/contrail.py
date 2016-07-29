@@ -14,6 +14,12 @@ import uuid
 LOG = logging.getLogger(__name__)
 
 
+def set_auth_token(func):
+    def wrapper(self, *args, **kwargs):
+        self.vnc_lib().set_auth_token(self.stack.context.auth_token)
+        return func(self, *args, **kwargs)
+    return wrapper
+
 class ContrailResource(resource.Resource):
     _DEFAULT_USER = 'admin'
     _DEFAULT_PASSWD = 'contrail123'
