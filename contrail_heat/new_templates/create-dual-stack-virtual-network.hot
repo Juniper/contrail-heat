@@ -1,0 +1,71 @@
+heat_template_version: 2015-04-30
+
+description: Heat template to create a Virtual Network with IPv4/IPv6 subnets & create TWO servers for testing
+
+parameters:
+  private_net_name:
+    type: string
+    description: Name of private network to be created
+  private_net_cidr_4:
+    type: string
+    description: Private network address (CIDR notation)
+  private_net_gateway_4:
+    type: string
+    description: Private network gateway address
+  private_net_cidr_6:
+    type: string
+    description: Private network address (CIDR notation)
+  private_net_gateway_6:
+    type: string
+    description: Private network gateway address
+  server_left_name:
+    type: string
+    description: Server left name
+  server_right_name:
+    type: string
+    description: Server right name
+  image:
+    type: string
+    description: Image name
+  flavor:
+    type: string
+    description: Flavor name
+
+resources:
+  private_net:
+    type: OS::Neutron::Net
+    properties:
+      name: { get_param: private_net_name }
+
+  private_subnet_4:
+    type: OS::Neutron::Subnet
+    properties:
+      network_id: { get_resource: private_net }
+      cidr: { get_param: private_net_cidr_4 }
+      gateway_ip: { get_param: private_net_gateway_4 }
+
+  private_subnet_6:
+    type: OS::Neutron::Subnet
+    properties:
+      ip_version: 6
+      network_id: { get_resource: private_net }
+      cidr: { get_param: private_net_cidr_6 }
+      gateway_ip: { get_param: private_net_gateway_6 }
+
+  server_left:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: server_left_name }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: private_net }
+
+  server_right:
+    type: OS::Nova::Server
+    properties:
+      name: { get_param: server_right_name }
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      networks:
+        - network: { get_resource: private_net }
