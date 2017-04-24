@@ -29,6 +29,7 @@ class ContrailResource(resource.Resource):
     _DEFAULT_BASE_URL = '/'
     _DEFAULT_AUTH_HOST = '127.0.0.1'
     _DEFAULT_USE_SSL = False
+    _vnc_lib = None
 
     def __init__(self, name, json_snippet, stack):
         super(ContrailResource, self).__init__(name, json_snippet, stack)
@@ -66,7 +67,6 @@ class ContrailResource(resource.Resource):
                                        'clients_contrail',
                                        'use_ssl',
                                        self._DEFAULT_USE_SSL)
-        self._vnc_lib = None
 
     @staticmethod
     def _read_cfg(cfg_parser, section, option, default):
@@ -113,8 +113,8 @@ class ContrailResource(resource.Resource):
             raise ex
 
     def vnc_lib(self):
-        if self._vnc_lib is None:
-            self._vnc_lib = vnc_api.VncApi(self._user,
+        if ContrailResource._vnc_lib is None:
+            ContrailResource._vnc_lib = vnc_api.VncApi(self._user,
                                            self._passwd,
                                            self._tenant,
                                            self._api_server_ip,
@@ -122,13 +122,13 @@ class ContrailResource(resource.Resource):
                                            self._api_base_url,
                                            api_server_use_ssl=self._use_ssl,
                                            auth_host=self._auth_host_ip)
-        return self._vnc_lib
+        return ContrailResource._vnc_lib
 
     # This function will make sure you can create resources with same name. 
     def resource_create(self, obj):
          resource_type = obj.get_type()
          resource_type = resource_type.replace('-','_')
-         create_method = getattr(self._vnc_lib, resource_type + '_create')
+         create_method = getattr(ContrailResource._vnc_lib, resource_type + '_create')
          try:
              obj_uuid = create_method(obj)
          except RefsExistError:
