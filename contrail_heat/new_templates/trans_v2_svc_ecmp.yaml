@@ -1,0 +1,638 @@
+heat_template_version: 2015-04-30
+
+parameters:
+
+#VN
+  m_ipam_name:
+    type: string
+    description: Name of management IPAM to be created
+  l_ipam_name:
+    type: string
+    description: Name of left IPAM to be created
+  r_ipam_name:
+    type: string
+    description: Name of right IPAM to be created
+  trans_m_ipam_name:
+    type: string
+    description: Name of trans management IPAM to be created
+  trans_l_ipam_name:
+    type: string
+    description: Name of trans left IPAM to be created
+  trans_r_ipam_name:
+    type: string
+    description: Name of trans right IPAM to be created
+  m_vn_name:
+    type: string
+    description: Name of management network to be created
+  l_vn_name:
+    type: string
+    description: Name of left network to be created
+  r_vn_name:
+    type: string
+    description: Name of right network to be created
+  l_vn_fqdn:
+    type: string
+    description: FQ Name of left network to be created
+  r_vn_fqdn:
+    type: string
+    description: FQ Name of right network to be created
+  trans_m_vn_name:
+    type: string
+    description: Name of management network to be created for bridge
+  trans_l_vn_name:
+    type: string
+    description: Name of left network to be created for bridge 
+  trans_r_vn_name:
+    type: string
+    description: Name of right network to be created for bridge 
+
+# Subnet Config
+  m_subnet_prefix:
+    type: string
+    description: subnet prefix for mgmt network
+  m_subnet_prefix_len:
+    type: string
+    description: subnet prefix len for mgmt network
+  l_subnet_prefix:
+    type: string
+    description: subnet prefix for left network
+  l_subnet_prefix_len:
+    type: string
+    description: subnet prefix len for left network
+  r_subnet_prefix:
+    type: string
+    description: subnet prefix for right network
+  r_subnet_prefix_len:
+    type: string
+    description: subnet prefix len for right network
+  trans_m_subnet_prefix:
+    type: string
+    description: subnet prefix for trans_mgmt network
+  trans_m_subnet_prefix_len:
+    type: string
+    description: subnet prefix len for trans_mgmt network
+  trans_l_subnet_prefix:
+    type: string
+    description: subnet prefix for trans_left network
+  trans_l_subnet_prefix_len:
+    type: string
+    description: subnet prefix len for trans_left network
+  trans_r_subnet_prefix:
+    type: string
+    description: subnet prefix for trans_right network
+  trans_r_subnet_prefix_len:
+    type: string
+    description: subnet prefix len for trans_right network
+  subnets_addr_from_start:
+    type: string
+    description: Flag to set the starting address in a subnet
+#ST
+  domain:                                                                                                                                                                                                                                   
+    type: string                                                                                                                                                                                                                            
+    description: Name of the Domain                                                                                                                                                                                                         
+  st_trans_name:
+    type: string
+    description: Name of the trans ST
+  st_version:
+    type: string
+    description: Version of the ST
+  st_trans_mode:
+    type: string
+    description: Mode of the ST
+  st_trans_type:
+    type: string
+    description: Type of the ST
+  st_trans_mgmt_intf:
+    type: string
+    description: mgmt interface
+  st_trans_left_intf:
+    type: string
+    description: left interface
+  st_trans_right_intf:
+    type: string
+    description: left interface
+  service_template_properties_availability_zone_enable:
+    type: string
+    description: Indicates availability zone is enabled
+  service_template_properties_ordered_interfaces:
+    type: string
+    description: Indicates service interfaces are ordered
+  service_template_properties_service_virtualization_type:
+    type: string
+    description: Indicates virtualization type
+
+#SI
+  si_trans_name:
+    type: string
+    description: Name of the Trans SI
+  si_trans_fq_name:
+    type: string
+    description: FQ Name of the Trans SI
+  service_instance_properties_ha_mode:
+    type: string
+    description: HA Mode of the SI
+
+#PT
+  pt_trans_name:
+    type: string
+    description: Name of the Trans PT
+
+#SVM
+  svm_trans_name:
+    type: string
+    description: Name of the Trans SVM
+  svm_trans_name2:
+    type: string
+    description: Name of the Trans SVM2
+  svm_trans_image_name:
+    type: string
+    description: Name of the Trans image name
+  svm_trans_flavor:  
+    type: string
+    description: Flavor of the Trans SVM
+
+#End VM
+  l_vm_name:
+    type: string
+    description: Name of the left VM
+  r_vm_name:
+    type: string
+    description: Name of the right VM
+  image:
+    type: string
+    description: Name of the End VM 
+  flavor:  
+    type: string
+    description: Flavor of the End VM
+
+#Policy
+  pt_policy_name: 
+    type: string                                                                                                                                                                                                                            
+    description: Name of the Policy                                                                                                                                                                                                        
+  pt_policy_fq_name:
+    type: string                                                                                                                                                                                                                            
+    description: FQDN of the Policy                                                                                                                                                                                                         
+  simple_action:                                                                                                                                                                                                                            
+    type: string                                                                                                                                                                                                                            
+    description: Pass or Deny                                                                                                                                                                                                               
+  protocol:                                                                                                                                                                                                                                 
+    type: string                                                                                                                                                                                                                            
+    description: Protocol                                                                                                                                                                                                                   
+  src_port_end:                                                                                                                                                                                                                             
+    type: number                                                                                                                                                                                                                            
+    description: End of the Source Port Range                                                                                                                                                                                               
+  src_port_start:                                                                                                                                                                                                                           
+    type: number                                                                                                                                                                                                                            
+    description: Start of the Source Port Range                                                                                                                                                                                             
+  direction:                                                                                                                                                                                                                                
+    type: string                                                                                                                                                                                                                            
+    description: Direction of the Policy                                                                                                                                                                                                    
+  dst_port_end:                                                                                                                                                                                                                             
+    type: number                                                                                                                                                                                                                            
+    description: End of the Destination Port Range                                                                                                                                                                                          
+  dst_port_start:                                                                                                                                                                                                                           
+    type: number                                                                                                                                                                                                                            
+    description: Start of the Destination Port Range 
+
+resources:
+
+#VN  
+  m_ipam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: { get_param: m_ipam_name }
+
+  l_ipam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: { get_param: l_ipam_name }
+
+  r_ipam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: { get_param: r_ipam_name }
+
+  m_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    depends_on: [ m_ipam ]
+    properties:
+      name: { get_param: m_vn_name }
+      network_ipam_refs: [{ get_resource: m_ipam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: m_subnet_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: m_subnet_prefix_len },
+                },
+	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: subnets_addr_from_start },
+            }]
+         }]
+
+  l_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    depends_on: [ l_ipam, pt_policy ]
+    properties:
+      name: { get_param: l_vn_name }
+      network_ipam_refs: [{ get_resource: l_ipam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: l_subnet_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: l_subnet_prefix_len },
+                },
+               network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: subnets_addr_from_start },
+ 	     }]
+	 }]
+      network_policy_refs: [{ get_param: pt_policy_fq_name }]
+      network_policy_refs_data:
+        [{
+          network_policy_refs_data_sequence:
+            {
+              network_policy_refs_data_sequence_major: 0,
+              network_policy_refs_data_sequence_minor: 0,
+            },
+        }]
+        
+  r_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    depends_on: [ r_ipam, pt_policy ]
+    properties:
+      name: { get_param: r_vn_name }
+      network_ipam_refs: [{ get_resource: r_ipam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: r_subnet_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: r_subnet_prefix_len },
+                },
+	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: subnets_addr_from_start },
+            }]
+         }]
+      network_policy_refs: [{ get_param: pt_policy_fq_name }]
+      network_policy_refs_data:
+        [{
+          network_policy_refs_data_sequence:
+            {
+              network_policy_refs_data_sequence_major: 0,
+              network_policy_refs_data_sequence_minor: 0,
+            },
+        }]
+
+  trans_m_ipam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: { get_param: trans_m_ipam_name }
+
+  trans_l_ipam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: { get_param: trans_l_ipam_name }
+
+  trans_r_ipam:
+    type: OS::ContrailV2::NetworkIpam
+    properties:
+      name: { get_param: trans_r_ipam_name }
+
+  trans_m_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    depends_on: [ trans_m_ipam ]
+    properties:
+      name: { get_param: trans_m_vn_name }
+      network_ipam_refs: [{ get_resource: trans_m_ipam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: trans_m_subnet_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: trans_m_subnet_prefix_len },
+                },
+	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: subnets_addr_from_start },
+            }]
+         }]
+
+  trans_l_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    depends_on: [ trans_l_ipam ]
+    properties:
+      name: { get_param: trans_l_vn_name }
+      network_ipam_refs: [{ get_resource: trans_l_ipam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: trans_l_subnet_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: trans_l_subnet_prefix_len },
+                },
+               network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: subnets_addr_from_start },
+ 	     }]
+	 }]
+        
+  trans_r_vn:
+    type: OS::ContrailV2::VirtualNetwork
+    depends_on: [ trans_r_ipam ]
+    properties:
+      name: { get_param: trans_r_vn_name }
+      network_ipam_refs: [{ get_resource: trans_r_ipam }]
+      network_ipam_refs_data:
+        [{
+          network_ipam_refs_data_ipam_subnets:
+            [{
+              network_ipam_refs_data_ipam_subnets_subnet:
+                {
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix: { get_param: trans_r_subnet_prefix },
+                  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len: { get_param: trans_r_subnet_prefix_len },
+                },
+	      network_ipam_refs_data_ipam_subnets_addr_from_start: { get_param: subnets_addr_from_start },
+            }]
+         }]
+
+#ST 
+  st_trans:
+    type: OS::ContrailV2::ServiceTemplate
+    properties:
+      name: { get_param: st_trans_name }
+      service_template_properties:
+        {
+          service_template_properties_version: { get_param: st_version },
+          service_template_properties_service_mode: { get_param: st_trans_mode },
+          service_template_properties_service_type: { get_param: st_trans_type },
+          service_template_properties_interface_type:
+            [
+              {
+              service_template_properties_interface_type_service_interface_type: { get_param: st_trans_mgmt_intf },
+              },
+              {
+              service_template_properties_interface_type_service_interface_type: { get_param: st_trans_left_intf },
+              },
+              {
+              service_template_properties_interface_type_service_interface_type: { get_param: st_trans_right_intf },
+              }
+            ],
+          service_template_properties_ordered_interfaces: { get_param: service_template_properties_ordered_interfaces },
+          service_template_properties_service_virtualization_type: { get_param: service_template_properties_service_virtualization_type },
+          service_template_properties_availability_zone_enable: { get_param: service_template_properties_availability_zone_enable },
+        }
+      domain: { get_param: domain }
+
+#SI
+  si_trans:
+    type: OS::ContrailV2::ServiceInstance
+    depends_on: [ st_trans ]
+    properties:
+      name: { get_param: si_trans_name }
+      service_instance_properties:
+        {
+          service_instance_properties_interface_list:
+            [
+              {
+                service_instance_properties_interface_list_virtual_network:
+                 {
+                   list_join: [':', { get_attr: [ m_vn, fq_name ] } ]
+                 },
+              },
+              {
+              service_instance_properties_interface_list_virtual_network:
+                {
+                   list_join: [':', { get_attr: [ l_vn, fq_name ] } ]
+                },
+              },
+              {
+              service_instance_properties_interface_list_virtual_network:
+                {
+                   list_join: [':', { get_attr: [ r_vn, fq_name ] } ]
+                },
+              }
+            ],
+         service_instance_properties_ha_mode: { get_param: service_instance_properties_ha_mode }, 
+        }
+      service_template_refs: [{ get_resource: st_trans }]
+
+#PT
+  pt_trans:
+    type: OS::ContrailV2::PortTuple
+    depends_on: [ si_trans ]
+    properties:
+      name: { get_param: pt_trans_name }
+      service_instance: { list_join: [':', { get_attr: [ si_trans, fq_name ] } ] }
+
+#VMI
+  si_trans_vmi_mgmt:
+    type: OS::ContrailV2::VirtualMachineInterface
+    depends_on: [ pt_trans ]
+    properties:
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: st_trans_mgmt_intf },
+        }
+      port_tuple_refs: [{ get_resource: pt_trans }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_m_vn, fq_name ] } ] }]
+  
+  si_trans_vmi_left:
+    type: OS::ContrailV2::VirtualMachineInterface
+    depends_on: [ pt_trans ]
+    properties:
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: st_trans_left_intf },
+        }
+      port_tuple_refs: [{ get_resource: pt_trans }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_l_vn, fq_name ] } ] }]
+
+  si_trans_vmi_right:
+    type: OS::ContrailV2::VirtualMachineInterface
+    depends_on: [ pt_trans ]
+    properties:
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: st_trans_right_intf },
+        }
+      port_tuple_refs: [{ get_resource: pt_trans }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_r_vn, fq_name ] } ] }]
+
+  si_trans_vmi_mgmt2:
+    type: OS::ContrailV2::VirtualMachineInterface
+    depends_on: [ pt_trans ]
+    properties:
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: st_trans_mgmt_intf },
+        }
+      port_tuple_refs: [{ get_resource: pt_trans }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_m_vn, fq_name ] } ] }]
+  
+  si_trans_vmi_left2:
+    type: OS::ContrailV2::VirtualMachineInterface
+    depends_on: [ pt_trans ]
+    properties:
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: st_trans_left_intf },
+        }
+      port_tuple_refs: [{ get_resource: pt_trans }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_l_vn, fq_name ] } ] }]
+
+  si_trans_vmi_right2:
+    type: OS::ContrailV2::VirtualMachineInterface
+    depends_on: [ pt_trans ]
+    properties:
+      virtual_machine_interface_properties:
+        {
+          virtual_machine_interface_properties_service_interface_type: { get_param: st_trans_right_intf },
+        }
+      port_tuple_refs: [{ get_resource: pt_trans }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_r_vn, fq_name ] } ] }]
+#IIP
+  si_trans_iip_mgmt:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ si_trans_vmi_mgmt, m_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_mgmt }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_m_vn, fq_name ] } ] }]
+
+  si_trans_iip_left:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ si_trans_vmi_left, l_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_left }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_l_vn, fq_name ] } ] }]
+
+  si_trans_iip_right:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ si_trans_vmi_right, r_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_right }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_r_vn, fq_name ] } ] }]
+
+  si_trans_iip_mgmt2:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ si_trans_vmi_mgmt2, m_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_mgmt2 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_m_vn, fq_name ] } ] }]
+
+  si_trans_iip_left2:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ si_trans_vmi_left2, l_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_left2 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_l_vn, fq_name ] } ] }]
+
+  si_trans_iip_right2:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ si_trans_vmi_right2, r_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_right2 }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_r_vn, fq_name ] } ] }]
+
+#SVM
+  svm_trans:
+    type: OS::Nova::Server
+    depends_on: [ si_trans_iip_mgmt, si_trans_iip_left, si_trans_iip_right ]
+    properties:
+      name: {get_param: svm_trans_name }
+      image: { get_param:  svm_trans_image_name }
+      flavor: { get_param: svm_trans_flavor }
+      networks:
+        - port: { get_resource: si_trans_vmi_mgmt }
+        - port: { get_resource: si_trans_vmi_left }
+        - port: { get_resource: si_trans_vmi_right }
+
+  svm_trans2:
+    type: OS::Nova::Server
+    depends_on: [ si_trans_iip_mgmt2, si_trans_iip_left2, si_trans_iip_right2 ]
+    properties:
+      name: {get_param: svm_trans_name2 }
+      image: { get_param:  svm_trans_image_name }
+      flavor: { get_param: svm_trans_flavor }
+      networks:
+        - port: { get_resource: si_trans_vmi_mgmt2 }
+        - port: { get_resource: si_trans_vmi_left2 }
+        - port: { get_resource: si_trans_vmi_right2 }
+
+#End VM
+  l_vm_vmi:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ l_vn, fq_name ] } ] }]
+  
+  r_vm_vmi:
+    type: OS::ContrailV2::VirtualMachineInterface
+    properties:
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ r_vn, fq_name ] } ] }]
+ 
+  l_vm_iip:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ l_vm_vmi, l_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: l_vm_vmi }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ l_vn, fq_name ] } ] }]
+
+  r_vm_iip:
+    type: OS::ContrailV2::InstanceIp
+    depends_on: [ r_vm_vmi, r_vn ]
+    properties:
+      virtual_machine_interface_refs: [{ get_resource: r_vm_vmi }]
+      virtual_network_refs: [{ list_join: [':', { get_attr: [ r_vn, fq_name ] } ] }]
+ 
+  l_vm:
+    type: OS::Nova::Server
+    depends_on: [ l_vm_iip ]
+    properties:
+      name: {get_param: l_vm_name }
+      image: { get_param:  image }
+      flavor: { get_param: flavor }
+      networks:
+        - port: { get_resource: l_vm_vmi }
+
+  r_vm:
+    type: OS::Nova::Server
+    depends_on: [ r_vm_iip ]
+    properties:
+      name: {get_param: r_vm_name }
+      image: { get_param:  image }
+      flavor: { get_param: flavor }
+      networks:
+        - port: { get_resource: r_vm_vmi }
+
+# Policy
+  pt_policy:
+    type: OS::ContrailV2::NetworkPolicy
+    properties:
+      name: { get_param: pt_policy_name }
+      network_policy_entries: { network_policy_entries_policy_rule: [{ 
+		network_policy_entries_policy_rule_direction: { get_param: direction },
+		network_policy_entries_policy_rule_protocol: { get_param: protocol },
+		network_policy_entries_policy_rule_src_ports: [{
+			network_policy_entries_policy_rule_src_ports_start_port: { get_param: src_port_start },
+			network_policy_entries_policy_rule_src_ports_end_port: { get_param: src_port_end }
+								}],
+ 		network_policy_entries_policy_rule_dst_ports: [{
+			network_policy_entries_policy_rule_dst_ports_start_port: { get_param: dst_port_start },
+			network_policy_entries_policy_rule_dst_ports_end_port: { get_param: dst_port_end }
+								}],
+		network_policy_entries_policy_rule_dst_addresses: [{
+			network_policy_entries_policy_rule_dst_addresses_virtual_network: { get_param: r_vn_fqdn }
+								}],
+		network_policy_entries_policy_rule_src_addresses: [{
+			network_policy_entries_policy_rule_src_addresses_virtual_network: { get_param: l_vn_fqdn }
+								}],
+		network_policy_entries_policy_rule_action_list: { 
+			network_policy_entries_policy_rule_action_list_simple_action: { get_param: simple_action },
+#			network_policy_entries_policy_rule_action_list_apply_service: 
+#									[{ get_param: si_fq_name }]
+								},
+									}]
+	}
