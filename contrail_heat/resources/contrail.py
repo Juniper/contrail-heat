@@ -29,6 +29,7 @@ class ContrailResource(resource.Resource):
     _DEFAULT_BASE_URL = '/'
     _DEFAULT_AUTH_HOST = '127.0.0.1'
     _DEFAULT_USE_SSL = False
+    _DEFAULT_AUTH_PROTOCOL = 'http'
     _vnc_lib = None
 
     def __init__(self, name, json_snippet, stack):
@@ -63,6 +64,10 @@ class ContrailResource(resource.Resource):
                                             'clients_contrail',
                                             'auth_host_ip',
                                             self._DEFAULT_AUTH_HOST)
+        self._auth_protocol = self._read_cfg(cfg_parser,
+                                             'clients_contrail',
+                                             'auth_protocol',
+                                             self._DEFAULT_AUTH_PROTOCOL)
         self._use_ssl = self._read_cfg(cfg_parser,
                                        'clients_contrail',
                                        'use_ssl',
@@ -121,7 +126,8 @@ class ContrailResource(resource.Resource):
                                            self._api_server_port,
                                            self._api_base_url,
                                            api_server_use_ssl=self._use_ssl,
-                                           auth_host=self._auth_host_ip)
+                                           auth_host=self._auth_host_ip,
+                                           auth_protocol=self._auth_protocol)
         return ContrailResource._vnc_lib
 
     # This function will make sure you can create resources with same name. 
