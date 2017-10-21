@@ -39,51 +39,18 @@ parameters:
   service_template_properties_service_type:
     type: string
     description: service type
-  service_template_properties_image_name:
-    type: string
-    description: Name of the image
-  service_template_properties_flavor:
-    type: string
-    description: Flavor
   service_template_properties_interface_type_service_interface_type_1:
     type: string
     description: service_interface_type for the ServiceTemplate
-  service_template_properties_interface_type_shared_ip_1:
-    type: boolean
-    description: shared_ip for the ServiceTemplate
-  service_template_properties_interface_type_static_route_enable_1:
-    type: boolean
-    description: static_route_enable for the ServiceTemplate
   service_template_properties_interface_type_service_interface_type_2:
     type: string
     description: service_interface_type for the ServiceTemplate
-  service_template_properties_interface_type_shared_ip_2:
-    type: boolean
-    description: shared_ip for the ServiceTemplate
-  service_template_properties_interface_type_static_route_enable_2:
-    type: boolean
-    description: static_route_enable for the ServiceTemplate
   service_template_properties_interface_type_service_interface_type_3:
     type: string
     description: service_interface_type for the ServiceTemplate
-  service_template_properties_interface_type_shared_ip_3:
-    type: boolean
-    description: shared_ip for the ServiceTemplate
-  service_template_properties_interface_type_static_route_enable_3:
-    type: boolean
-    description: static_route_enable for the ServiceTemplate
-  service_template_properties_service_scaling:
-    type: string
-    description: Indicates whether service scaling is enabled
-  service_template_properties_availability_zone_enable:
-    type: string
-    description: Indicates availability zone is enabled
   service_template_properties_ordered_interfaces:
     type: string
     description: Indicates service interfaces are ordered
-  service_template_properties_service_virtualization_type:
-    type: string
-    description: Indicates virtualization type
 
   service_instance_name:
     type: string
@@ -93,24 +60,6 @@ parameters:
     type: string
     label: Service instance fq name
     description: Service instance FQDN for port tuple
-  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_2:
-    type: string
-    description: ip_prefix for the ServiceInstance
-  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len_2:
-    type: number
-    description: ip_prefix_len for the ServiceInstance
-  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_mac_2:
-    type: string
-    description: mac for the ServiceInstance
-  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_3:
-    type: string
-    description: ip_prefix for the ServiceInstance
-  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len_3:
-    type: number
-    description: ip_prefix_len for the ServiceInstance
-  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode_3:
-    type: string
-    description: address_mode for the ServiceInstance
   
   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
     type: string
@@ -137,6 +86,12 @@ parameters:
   svm_name: 
     type: string
     description: Name of the SVM
+  svm_flavor: 
+    type: string
+    description: Flavor of the SVM
+  svm_image_name: 
+    type: string
+    description: Name of the SVM image
   flavor: 
     type: string
     description: Flavor of the end VMs
@@ -281,30 +236,19 @@ resources:
           service_template_properties_version: { get_param: service_template_properties_version },
           service_template_properties_service_mode: { get_param: service_template_properties_service_mode },
           service_template_properties_service_type: { get_param: service_template_properties_service_type },
-          service_template_properties_image_name: { get_param: service_template_properties_image_name },
-          service_template_properties_service_scaling: { get_param: service_template_properties_service_scaling },
           service_template_properties_interface_type:
             [
               {
               service_template_properties_interface_type_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_1 },
-              service_template_properties_interface_type_shared_ip: { get_param: service_template_properties_interface_type_shared_ip_1 },
-              service_template_properties_interface_type_static_route_enable: { get_param: service_template_properties_interface_type_static_route_enable_1 },
               },
               {
               service_template_properties_interface_type_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_2 },
-              service_template_properties_interface_type_shared_ip: { get_param: service_template_properties_interface_type_shared_ip_2 },
-              service_template_properties_interface_type_static_route_enable: { get_param: service_template_properties_interface_type_static_route_enable_2 },
               },
               {
               service_template_properties_interface_type_service_interface_type: { get_param: service_template_properties_interface_type_service_interface_type_3 },
-              service_template_properties_interface_type_shared_ip: { get_param: service_template_properties_interface_type_shared_ip_3 },
-              service_template_properties_interface_type_static_route_enable: { get_param: service_template_properties_interface_type_static_route_enable_3 },
               }
             ],
-          service_template_properties_flavor: { get_param: service_template_properties_flavor },
           service_template_properties_ordered_interfaces: { get_param: service_template_properties_ordered_interfaces },
-          service_template_properties_service_virtualization_type: { get_param: service_template_properties_service_virtualization_type },
-          service_template_properties_availability_zone_enable: { get_param: service_template_properties_availability_zone_enable },
         }
       domain: { get_param: domain }
 
@@ -328,35 +272,11 @@ resources:
                 {
                    list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ]
                 },
-              service_instance_properties_interface_list_allowed_address_pairs:
-                {
-                  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair:
-                    [{
-                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip:
-                        {
-                          service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_2 },
-                          service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len_2 },
-                        },
-                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_mac: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_mac_2 },
-                    }],
-                },
               },
               {
               service_instance_properties_interface_list_virtual_network:
                 {
                    list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ]
-                },
-              service_instance_properties_interface_list_allowed_address_pairs:
-                {
-                  service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair:
-                    [{
-                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip:
-                        {
-                          service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_3 },
-                          service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_ip_ip_prefix_len_3 },
-                        },
-                      service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode: { get_param: service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode_3 },
-                    }],
                 },
               }
             ],
@@ -443,8 +363,8 @@ resources:
     depends_on: [ template_InstanceIp_1, template_InstanceIp_2, template_InstanceIp_3 ]
     properties:
       name: {get_param: svm_name }
-      image: { get_param:  service_template_properties_image_name }
-      flavor: { get_param: service_template_properties_flavor }
+      image: { get_param:  svm_image_name }
+      flavor: { get_param: svm_flavor }
       networks:
         - port: { get_resource: template_VirtualMachineInterface_1 }
         - port: { get_resource: template_VirtualMachineInterface_2 }
