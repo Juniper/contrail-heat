@@ -13,6 +13,8 @@ import uuid
 
 LOG = logging.getLogger(__name__)
 
+cfg_parser = ConfigParser.ConfigParser()
+cfg_parser.read("/etc/heat/heat.conf")
 
 def set_auth_token(func):
     def wrapper(self, *args, **kwargs):
@@ -33,8 +35,6 @@ class ContrailResource(resource.Resource):
 
     def __init__(self, name, json_snippet, stack):
         super(ContrailResource, self).__init__(name, json_snippet, stack)
-        cfg_parser = ConfigParser.ConfigParser()
-        cfg_parser.read("/etc/heat/heat.conf")
         self._user = self._read_cfg(cfg_parser,
                                     'clients_contrail',
                                     'user',
