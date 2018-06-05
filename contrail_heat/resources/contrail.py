@@ -122,7 +122,7 @@ class ContrailResource(resource.Resource):
             ContrailResource._vnc_lib = vnc_api.VncApi(self._user,
                                            self._passwd,
                                            self._tenant,
-                                           self._api_server_ip,
+                                           self._api_server_ip.split(),
                                            self._api_server_port,
                                            self._api_base_url,
                                            api_server_use_ssl=self._use_ssl,
@@ -130,7 +130,7 @@ class ContrailResource(resource.Resource):
                                            auth_protocol=self._auth_protocol)
         return ContrailResource._vnc_lib
 
-    # This function will make sure you can create resources with same name. 
+    # This function will make sure you can create resources with same name.
     def resource_create(self, obj):
          resource_type = obj.get_type()
          resource_type = resource_type.replace('-','_')
@@ -142,6 +142,6 @@ class ContrailResource(resource.Resource):
              obj.name += '-' + obj.uuid
              obj.fq_name[-1] += '-' + obj.uuid
              obj_uuid = create_method(obj)
- 
+
          return obj_uuid
     #end _resource_create
