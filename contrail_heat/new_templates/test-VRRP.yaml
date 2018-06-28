@@ -165,6 +165,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ m_vmi1 ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: m_vmi1 }]
       virtual_network_refs: [{ get_param: m_vn_fqn }]
@@ -172,6 +173,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ l_vmi1 ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: l_vmi1 }]
       virtual_network_refs: [{ get_param: l_vn_fqn }]
@@ -179,6 +181,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ r_vmi1 ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: r_vmi1 }]
       virtual_network_refs: [{ get_param: r_vn_fqn }]
@@ -213,6 +216,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ m_iip1, l_iip1, r_iip1 ]
     properties:
+      config_root: "config-root"
       name: {get_param: vm1_name }
       image: { get_param:  vsrx_image }
       flavor: { get_param: vsrx_flavor }
@@ -225,6 +229,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ m_vmi2 ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: m_vmi2 }]
       virtual_network_refs: [{ get_param: m_vn_fqn }]
@@ -232,6 +237,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ l_vmi2 ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: l_vmi2 }]
       virtual_network_refs: [{ get_param: l_vn_fqn }]
@@ -239,6 +245,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ r_vmi2 ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: r_vmi2 }]
       virtual_network_refs: [{ get_param: r_vn_fqn }]
@@ -274,6 +281,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ m_iip2, l_iip2, r_iip2 ]
     properties:
+      config_root: "config-root"
       name: {get_param: vm2_name }
       image: { get_param:  vsrx_image }
       flavor: { get_param: vsrx_flavor }
@@ -292,6 +300,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ test_vmi ]
     properties:
+      config_root: "config-root"
       instance_ip_mode: { get_param: instance_ip_mode1 }
       virtual_machine_interface_refs: [{ get_resource: test_vmi }]
       virtual_network_refs: [{ get_param: l_vn_fqn }]
@@ -300,6 +309,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ test_iip ]
     properties:
+      config_root: "config-root"
       name: {get_param: test_vm_name }
       image: { get_param:  test_vm_image }
       flavor: { get_param: test_vm_flavor }

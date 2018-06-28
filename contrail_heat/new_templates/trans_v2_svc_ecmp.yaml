@@ -499,6 +499,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ si_trans_vmi_mgmt, m_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_mgmt }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_m_vn, fq_name ] } ] }]
 
@@ -506,6 +507,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ si_trans_vmi_left, l_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_left }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_l_vn, fq_name ] } ] }]
 
@@ -513,6 +515,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ si_trans_vmi_right, r_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_right }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_r_vn, fq_name ] } ] }]
 
@@ -520,6 +523,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ si_trans_vmi_mgmt2, m_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_mgmt2 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_m_vn, fq_name ] } ] }]
 
@@ -527,6 +531,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ si_trans_vmi_left2, l_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_left2 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_l_vn, fq_name ] } ] }]
 
@@ -534,6 +539,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ si_trans_vmi_right2, r_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: si_trans_vmi_right2 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ trans_r_vn, fq_name ] } ] }]
 
@@ -542,6 +548,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ si_trans_iip_mgmt, si_trans_iip_left, si_trans_iip_right ]
     properties:
+      config_root: "config-root"
       name: {get_param: svm_trans_name }
       image: { get_param:  svm_trans_image_name }
       flavor: { get_param: svm_trans_flavor }
@@ -554,6 +561,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ si_trans_iip_mgmt2, si_trans_iip_left2, si_trans_iip_right2 ]
     properties:
+      config_root: "config-root"
       name: {get_param: svm_trans_name2 }
       image: { get_param:  svm_trans_image_name }
       flavor: { get_param: svm_trans_flavor }
@@ -577,6 +585,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ l_vm_vmi, l_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: l_vm_vmi }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ l_vn, fq_name ] } ] }]
 
@@ -584,6 +593,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ r_vm_vmi, r_vn ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: r_vm_vmi }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ r_vn, fq_name ] } ] }]
  
@@ -591,6 +601,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ l_vm_iip ]
     properties:
+      config_root: "config-root"
       name: {get_param: l_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }
@@ -601,6 +612,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ r_vm_iip ]
     properties:
+      config_root: "config-root"
       name: {get_param: r_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }

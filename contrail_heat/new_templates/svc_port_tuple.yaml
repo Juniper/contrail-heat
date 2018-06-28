@@ -327,6 +327,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_1, template_VirtualNetwork_1 ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_1 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_1, fq_name ] } ] }]
 
@@ -334,6 +335,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_2, template_VirtualNetwork_2 ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_2 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
@@ -341,6 +343,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_3, template_VirtualNetwork_3 ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_3 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
@@ -348,6 +351,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_4, template_VirtualNetwork_2 ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_4 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_2, fq_name ] } ] }]
 
@@ -355,6 +359,7 @@ resources:
     type: OS::ContrailV2::InstanceIp
     depends_on: [ template_VirtualMachineInterface_5, template_VirtualNetwork_3 ]
     properties:
+      config_root: "config-root"
       virtual_machine_interface_refs: [{ get_resource: template_VirtualMachineInterface_5 }]
       virtual_network_refs: [{ list_join: [':', { get_attr: [ template_VirtualNetwork_3, fq_name ] } ] }]
 
@@ -362,6 +367,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ template_InstanceIp_1, template_InstanceIp_2, template_InstanceIp_3 ]
     properties:
+      config_root: "config-root"
       name: {get_param: svm_name }
       image: { get_param:  svm_image_name }
       flavor: { get_param: svm_flavor }
@@ -386,6 +392,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ template_InstanceIp_4 ]
     properties:
+      config_root: "config-root"
       name: {get_param: left_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }
@@ -396,6 +403,7 @@ resources:
     type: OS::Nova::Server
     depends_on: [ template_InstanceIp_5 ]
     properties:
+      config_root: "config-root"
       name: {get_param: right_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }
