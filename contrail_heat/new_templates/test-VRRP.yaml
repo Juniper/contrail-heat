@@ -216,7 +216,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ m_iip1, l_iip1, r_iip1 ]
     properties:
-      config_root: "config-root"
       name: {get_param: vm1_name }
       image: { get_param:  vsrx_image }
       flavor: { get_param: vsrx_flavor }
@@ -281,7 +280,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ m_iip2, l_iip2, r_iip2 ]
     properties:
-      config_root: "config-root"
       name: {get_param: vm2_name }
       image: { get_param:  vsrx_image }
       flavor: { get_param: vsrx_flavor }
@@ -309,7 +307,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ test_iip ]
     properties:
-      config_root: "config-root"
       name: {get_param: test_vm_name }
       image: { get_param:  test_vm_image }
       flavor: { get_param: test_vm_flavor }
