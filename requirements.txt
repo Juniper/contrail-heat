@@ -1,2 +1,2 @@
 heat
-vnc_api
+contrail-api-client
