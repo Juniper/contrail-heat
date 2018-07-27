@@ -799,7 +799,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ si_nat_iip_mgmt, si_nat_iip_left, si_nat_iip_right ]
     properties:
-      config_root: "config-root"
       name: {get_param: svm_nat_name }
       image: { get_param:  svm_nat_image_name }
       flavor: { get_param: svm_nat_flavor }
@@ -812,7 +811,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ si_in_net_iip_left, si_in_net_iip_right ]
     properties:
-      config_root: "config-root"
       name: {get_param: svm_in_net_name }
       image: { get_param:  svm_in_net_image_name }
       flavor: { get_param: svm_in_net_flavor }
@@ -824,7 +822,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ si_trans_iip_mgmt, si_trans_iip_left, si_trans_iip_right ]
     properties:
-      config_root: "config-root"
       name: {get_param: svm_trans_name }
       image: { get_param:  svm_trans_image_name }
       flavor: { get_param: svm_trans_flavor }
@@ -875,7 +872,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ r_vm_iip ]
     properties:
-      config_root: "config-root"
       name: {get_param: r_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }

@@ -367,7 +367,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ template_InstanceIp_1, template_InstanceIp_2, template_InstanceIp_3 ]
     properties:
-      config_root: "config-root"
       name: {get_param: svm_name }
       image: { get_param:  svm_image_name }
       flavor: { get_param: svm_flavor }
@@ -392,7 +391,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ template_InstanceIp_4 ]
     properties:
-      config_root: "config-root"
       name: {get_param: left_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }
@@ -403,7 +401,6 @@ resources:
     type: OS::Nova::Server
     depends_on: [ template_InstanceIp_5 ]
     properties:
-      config_root: "config-root"
       name: {get_param: right_vm_name }
       image: { get_param:  image }
       flavor: { get_param: flavor }
