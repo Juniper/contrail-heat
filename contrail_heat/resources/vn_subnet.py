@@ -189,6 +189,7 @@ class HeatVnSubnet(contrail.ContrailResource):
         if host_routes:
             subnet.set_host_routes(host_routes)
 
+    @contrail.set_auth_token
     def handle_create(self):
         try:
             vn_obj = self.vnc_lib().virtual_network_read(
@@ -222,6 +223,7 @@ class HeatVnSubnet(contrail.ContrailResource):
         self.vnc_lib().virtual_network_update(vn_obj)
         self.resource_id_set(subnet_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         subnet_uuid = self.resource_id
         try:
@@ -241,6 +243,7 @@ class HeatVnSubnet(contrail.ContrailResource):
                 break
         self.vnc_lib().virtual_network_update(vn_obj)
 
+    @contrail.set_auth_token
     def handle_delete(self):
         subnet_uuid = self.resource_id
         if subnet_uuid:
@@ -263,6 +266,7 @@ class HeatVnSubnet(contrail.ContrailResource):
                 vn_obj.del_network_ipam(ipam)
             self.vnc_lib().virtual_network_update(vn_obj)
 
+    @contrail.set_auth_token
     def _show_resource(self):
         dic = {}
         dic['network'] = self.properties[self.NETWORK]
