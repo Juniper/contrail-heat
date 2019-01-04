@@ -44,6 +44,7 @@ class HeatPhysicalInterface(contrail.ContrailResource):
         ),
     }
 
+    @contrail.set_auth_token
     def handle_create(self):
         pr_id = self.properties[self.PHYSICAL_ROUTER]
         if pr_id:
@@ -57,6 +58,7 @@ class HeatPhysicalInterface(contrail.ContrailResource):
         pi_uuid = self.vnc_lib().physical_interface_create(pi_obj)
         self.resource_id_set(pi_uuid)
 
+    @contrail.set_auth_token
     def _show_resource(self):
         pi_obj = self.vnc_lib().physical_interface_read(id=self.resource_id)
         dic = {}
@@ -66,12 +68,14 @@ class HeatPhysicalInterface(contrail.ContrailResource):
             [li['to'] for li in pi_obj.get_logical_interfaces() or []])
         return dic
 
+    @contrail.set_auth_token
     def handle_delete(self):
         try:
             self.vnc_lib().physical_interface_delete(id=self.resource_id)
         except Exception:
             pass
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         # TODO
         pass

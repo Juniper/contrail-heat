@@ -8,7 +8,7 @@ from heat.engine import constraints
 from heat.engine import clients
 from heat.engine import properties
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 
 try:
     from heat.openstack.common import log as logging
@@ -20,7 +20,7 @@ import copy
 LOG = logging.getLogger(__name__)
 
 
-class NetworkPolicy(ContrailResource):
+class NetworkPolicy(contrail.ContrailResource):
     PROPERTIES = (
         NAME, ENTRIES,
     ) = (
@@ -226,6 +226,7 @@ class NetworkPolicy(ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    @contrail.set_auth_token
     def handle_create(self):
         props = {}
         props['entries'] = copy.deepcopy(self.properties['entries'])
@@ -241,6 +242,7 @@ class NetworkPolicy(ContrailResource):
         np_uuid = super(NetworkPolicy, self).resource_create(np_obj) 
         self.resource_id_set(np_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         props = {}
         props['entries'] = copy.deepcopy(prop_diff['entries'])
@@ -261,6 +263,7 @@ class NetworkPolicy(ContrailResource):
             vnc_api.PolicyEntriesType.factory(**props['entries']))
         self.vnc_lib().network_policy_update(np_obj)
 
+    @contrail.set_auth_token
     def _show_resource(self):
         np_obj = self.vnc_lib().network_policy_read(id=self.resource_id)
         dict = {}
@@ -294,6 +297,7 @@ class NetworkPolicy(ContrailResource):
         dict['rules'] = rules
         return dict
 
+    @contrail.set_auth_token
     def handle_delete(self):
         try:
             self.vnc_lib().network_policy_delete(id=self.resource_id)

@@ -12,13 +12,13 @@ except ImportError:
     from oslo_log import log as logging
 from heat.engine import scheduler
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 import uuid
 
 LOG = logging.getLogger(__name__)
 
 
-class HeatPortTuple(ContrailResource):
+class HeatPortTuple(contrail.ContrailResource):
     PROPERTIES = (
         NAME, SERVICE_INSTANCE, PORTS
     ) = (
@@ -69,6 +69,7 @@ class HeatPortTuple(ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    @contrail.set_auth_token
     def handle_create(self):
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
@@ -104,9 +105,11 @@ class HeatPortTuple(ContrailResource):
 
         self.resource_id_set(pt_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         pass
 
+    @contrail.set_auth_token
     def handle_delete(self):
         if not self.resource_id:
             return
@@ -129,6 +132,7 @@ class HeatPortTuple(ContrailResource):
             LOG.warn(_("Unknown error %s.") % str(e))
             raise
 
+    @contrail.set_auth_token
     def _show_resource(self):
         pt_obj = self.vnc_lib().port_tuple_read(id=self.resource_id)
         si_obj = self.vnc_lib().service_instance_read(id=pt_obj.parent_uuid)

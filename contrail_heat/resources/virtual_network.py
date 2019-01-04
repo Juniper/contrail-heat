@@ -118,6 +118,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    @contrail.set_auth_token
     def handle_create(self):
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
@@ -148,6 +149,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         vn_uuid = super(ContrailVirtualNetwork, self).resource_create(vn_obj)
         self.resource_id_set(vn_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         try:
             vn_obj = self.vnc_lib().virtual_network_read(id=self.resource_id)
@@ -189,6 +191,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
             vn_obj.set_flood_unknown_unicast(False)
         self.vnc_lib().virtual_network_update(vn_obj)
 
+    @contrail.set_auth_token
     def _show_resource(self):
         vn_obj = self.vnc_lib().virtual_network_read(id=self.resource_id)
         rts = vn_obj.get_route_target_list().get_route_target()
@@ -204,6 +207,7 @@ class ContrailVirtualNetwork(contrail.ContrailResource):
         }
         return attrs
 
+    @contrail.set_auth_token
     def handle_delete(self):
         if self.resource_id is not None:
             try:
