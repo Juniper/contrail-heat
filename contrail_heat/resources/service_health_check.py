@@ -12,13 +12,13 @@ except ImportError:
     from oslo_log import log as logging
 from heat.engine import scheduler
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 import uuid
 
 LOG = logging.getLogger(__name__)
 
 
-class HeatServiceHealthCheck(ContrailResource):
+class HeatServiceHealthCheck(contrail.ContrailResource):
     PROPERTIES = (
         NAME, SERVICE_INSTANCE, SERVICE_PORT_TAG, MONITOR_TYPE,
         DELAY, TIMEOUT, MAX_RETRIES, HTTP_METHOD, URL_PATH,
@@ -151,6 +151,7 @@ class HeatServiceHealthCheck(ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    @contrail.set_auth_token
     def handle_create(self):
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
@@ -177,6 +178,7 @@ class HeatServiceHealthCheck(ContrailResource):
         health_uuid = self.vnc_lib().service_health_check_create(health_obj)
         self.resource_id_set(health_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         try:
             health_obj = self.vnc_lib().service_health_check_read(id=self.resource_id)
@@ -208,6 +210,7 @@ class HeatServiceHealthCheck(ContrailResource):
         health_obj.set_service_health_check_properties(health_props)
         self.vnc_lib().service_health_check_update(health_obj)
 
+    @contrail.set_auth_token
     def handle_delete(self):
         if not self.resource_id:
             return
@@ -236,6 +239,7 @@ class HeatServiceHealthCheck(ContrailResource):
             LOG.warn(_("Unknown error %s.") % str(e))
             raise
 
+    @contrail.set_auth_token
     def _show_resource(self):
         health_obj = self.vnc_lib().service_health_check_read(id=self.resource_id)
         health_props = health_obj.get_service_health_check_properties()

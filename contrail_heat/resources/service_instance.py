@@ -12,13 +12,13 @@ except ImportError:
     from oslo_log import log as logging
 from heat.engine import scheduler
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 import uuid
 
 LOG = logging.getLogger(__name__)
 
 
-class HeatServiceInstance(ContrailResource):
+class HeatServiceInstance(contrail.ContrailResource):
     PROPERTIES = (
         NAME, SERVICE_TEMPLATE, AUTO_POLICY, AVAILABILITY_ZONE,
         INTERFACE_LIST, SCALE_OUT, HA_MODE
@@ -232,6 +232,7 @@ class HeatServiceInstance(ContrailResource):
             return aaps
         return None
 
+    @contrail.set_auth_token
     def handle_create(self):
         try:
             st_obj = self.vnc_lib().service_template_read(
@@ -299,6 +300,7 @@ class HeatServiceInstance(ContrailResource):
         si_uuid = self.vnc_lib().service_instance_create(si_obj)
         self.resource_id_set(si_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         try:
             si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
@@ -368,6 +370,7 @@ class HeatServiceInstance(ContrailResource):
             except nova_exceptions.NotFound:
                 break
 
+    @contrail.set_auth_token
     def handle_delete(self):
         if not self.resource_id:
             return
@@ -400,6 +403,7 @@ class HeatServiceInstance(ContrailResource):
             LOG.warn(_("Unknown error %s.") % str(e))
             raise
 
+    @contrail.set_auth_token
     def _show_resource(self):
         si_obj = self.vnc_lib().service_instance_read(id=self.resource_id)
         dict = {}

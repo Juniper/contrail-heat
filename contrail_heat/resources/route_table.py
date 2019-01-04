@@ -12,13 +12,13 @@ except ImportError:
     from oslo_log import log as logging
 from heat.engine import scheduler
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 import uuid
 
 LOG = logging.getLogger(__name__)
 
 
-class HeatRouteTable(ContrailResource):
+class HeatRouteTable(contrail.ContrailResource):
     PROPERTIES = (
         NAME, SERVICE_INSTANCE, SERVICE_PORT_TAG, ROUTES
     ) = (
@@ -78,6 +78,7 @@ class HeatRouteTable(ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    @contrail.set_auth_token
     def handle_create(self):
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
@@ -100,6 +101,7 @@ class HeatRouteTable(ContrailResource):
         rt_uuid = self.vnc_lib().interface_route_table_create(rt_obj)
         self.resource_id_set(rt_uuid)
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         try:
             rt_obj = self.vnc_lib().interface_route_table_read(id=self.resource_id)
@@ -116,6 +118,7 @@ class HeatRouteTable(ContrailResource):
         rt_obj.set_interface_route_table_routes(route_table)
         self.vnc_lib().interface_route_table_update(rt_obj)
 
+    @contrail.set_auth_token
     def handle_delete(self):
         if not self.resource_id:
             return
@@ -144,6 +147,7 @@ class HeatRouteTable(ContrailResource):
             LOG.warn(_("Unknown error %s.") % str(e))
             raise
 
+    @contrail.set_auth_token
     def _show_resource(self):
         rt_obj = self.vnc_lib().interface_route_table_read(id=self.resource_id)
         si_list = rt_obj.get_service_instance_refs()
