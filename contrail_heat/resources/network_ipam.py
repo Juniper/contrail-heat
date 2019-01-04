@@ -36,7 +36,8 @@ class HeatNetworkIpam(contrail.ContrailResource):
             _('All attributes.'),
         ),
     }
-
+    
+    @contrail.set_auth_token
     def handle_create(self):
         tenant_id = self.stack.context.tenant_id
         project_obj = self.vnc_lib().project_read(id=str(uuid.UUID(tenant_id)))
@@ -45,6 +46,7 @@ class HeatNetworkIpam(contrail.ContrailResource):
         ni_uuid = super(HeatNetworkIpam, self).resource_create(ni_obj)
         self.resource_id_set(ni_uuid)
 
+    @contrail.set_auth_token
     def _show_resource(self):
         ni_obj = self.vnc_lib().network_ipam_read(id=self.resource_id)
         dic = {}
@@ -52,12 +54,14 @@ class HeatNetworkIpam(contrail.ContrailResource):
         dic['fq_name'] = ni_obj.get_fq_name_str()
         return dic
 
+    @contrail.set_auth_token
     def handle_delete(self):
         try:
             self.vnc_lib().network_ipam_delete(id=self.resource_id)
         except Exception:
             pass
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         # TODO
         pass

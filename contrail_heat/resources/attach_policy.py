@@ -6,7 +6,7 @@ from heat.common import exception
 from heat.engine import properties
 
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 
 try:
     from heat.openstack.common import log as logging
@@ -16,7 +16,7 @@ except ImportError:
 LOG = logging.getLogger(__name__)
 
 
-class AttachPolicy(ContrailResource):
+class AttachPolicy(contrail.ContrailResource):
 
     PROPERTIES = (
         NETWORK, POLICY, SEQUENCE
@@ -57,6 +57,7 @@ class AttachPolicy(ContrailResource):
         ),
     }
 
+    @contrail.set_auth_token
     def handle_create(self):
         try:
             vn_obj = self.vnc_lib().virtual_network_read(
@@ -86,6 +87,7 @@ class AttachPolicy(ContrailResource):
 
         self.resource_id_set('%s|%s' % (vn_obj.uuid, policy_obj.uuid))
 
+    @contrail.set_auth_token
     def handle_delete(self):
         if not self.resource_id:
             return

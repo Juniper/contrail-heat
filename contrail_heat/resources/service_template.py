@@ -10,12 +10,12 @@ try:
 except ImportError:
     from oslo_log import log as logging
 from vnc_api import vnc_api
-from contrail_heat.resources.contrail import ContrailResource
+from contrail_heat.resources import contrail
 
 logger = logging.getLogger(__name__)
 
 
-class HeatServiceTemplate(ContrailResource):
+class HeatServiceTemplate(contrail.ContrailResource):
     PROPERTIES = (
         NAME, DOMAIN, SERVICE_MODE, SERVICE_TYPE, IMAGE_NAME,
         SERVICE_SCALING, SERVICE_INTERFACE_TYPE_LIST, SHARED_IP_LIST,
@@ -168,6 +168,7 @@ class HeatServiceTemplate(ContrailResource):
 
     update_allowed_keys = ('Properties',)
 
+    @contrail.set_auth_token
     def handle_create(self):
         domain = self.vnc_lib().domain_read(
             fq_name=[self.properties[self.DOMAIN]])
@@ -221,6 +222,7 @@ class HeatServiceTemplate(ContrailResource):
         st_uuid = self.vnc_lib().service_template_create(st_obj)
         self.resource_id_set(st_uuid)
 
+    @contrail.set_auth_token
     def _show_resource(self):
         st_obj = self.vnc_lib().service_template_read(id=self.resource_id)
         dict = {}
@@ -235,12 +237,14 @@ class HeatServiceTemplate(ContrailResource):
         dict['service_instances'] = sis
         return dict
 
+    @contrail.set_auth_token
     def handle_delete(self):
         try:
             self.vnc_lib().service_template_delete(id=self.resource_id)
         except Exception:
             pass
 
+    @contrail.set_auth_token
     def handle_update(self, json_snippet, tmpl_diff, prop_diff):
         pass
 
