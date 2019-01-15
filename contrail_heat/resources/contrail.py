@@ -72,6 +72,10 @@ class ContrailResource(resource.Resource):
                                        'clients_contrail',
                                        'use_ssl',
                                        self._DEFAULT_USE_SSL)
+        self._apicafile = self._read_cfg(cfg_parser,
+                                       'clients_contrail',
+                                       'cafile',
+                                       None)
 
     @staticmethod
     def _read_cfg(cfg_parser, section, option, default):
@@ -126,6 +130,7 @@ class ContrailResource(resource.Resource):
                                            self._api_server_port,
                                            self._api_base_url,
                                            api_server_use_ssl=self._use_ssl,
+                                           apicafile=self._apicafile,
                                            auth_host=self._auth_host_ip,
                                            auth_protocol=self._auth_protocol)
         return ContrailResource._vnc_lib
