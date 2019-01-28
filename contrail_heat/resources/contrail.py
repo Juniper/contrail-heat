@@ -10,6 +10,7 @@ except ImportError:
 from vnc_api import vnc_api
 from vnc_api.vnc_api import NoIdError, RefsExistError
 import uuid
+from heat.engine.resources.openstack.heat import autoscaling_group
 
 LOG = logging.getLogger(__name__)
 
@@ -18,7 +19,10 @@ cfg_parser.read("/etc/heat/heat.conf")
 
 def set_auth_token(func):
     def wrapper(self, *args, **kwargs):
-        self.vnc_lib().set_auth_token(self.stack.context.auth_token)
+        if self.stack.context.auth_token or not isinstance(
+                self.stack.parent_resource,
+                autoscaling_group.AutoScalingResourceGroup):
+            self.vnc_lib().set_auth_token(self.stack.context.auth_token)
         return func(self, *args, **kwargs)
     return wrapper
 
