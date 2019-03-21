@@ -110,7 +110,12 @@ class ContrailResource(resource.Resource):
             return None
         if name == 'show':
             return attributes
-        return attributes.get(name)
+        attr_value = attributes.get(name)
+        # If attribute value returned is again an instance of some class
+        # then we need to return dictionary of instance attributes.
+        if hasattr(attr_value, '__dict__'):
+            return attr_value.__dict__
+        return attr_value
 
     @staticmethod
     def _ignore_not_found(ex):
