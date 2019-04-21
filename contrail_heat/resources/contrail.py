@@ -10,6 +10,7 @@ except ImportError:
 from vnc_api import vnc_api
 from vnc_api.vnc_api import NoIdError, RefsExistError
 import uuid
+from threading import Lock
 
 LOG = logging.getLogger(__name__)
 
@@ -18,8 +19,12 @@ cfg_parser.read("/etc/heat/heat.conf")
 
 def set_auth_token(func):
     def wrapper(self, *args, **kwargs):
-        self.vnc_lib().set_auth_token(self.stack.context.auth_token)
-        return func(self, *args, **kwargs)
+        self.mutex().acquire()
+        try:
+            self.vnc_lib().set_auth_token(self.stack.context.auth_token)
+            return func(self, *args, **kwargs)
+        finally:
+            self.mutex().release()
     return wrapper
 
 class ContrailResource(resource.Resource):
@@ -33,6 +38,7 @@ class ContrailResource(resource.Resource):
     _DEFAULT_USE_SSL = False
     _DEFAULT_AUTH_PROTOCOL = 'http'
     _vnc_lib = None
+    _mutex = None
 
     def __init__(self, name, json_snippet, stack):
         super(ContrailResource, self).__init__(name, json_snippet, stack)
@@ -150,3 +156,8 @@ class ContrailResource(resource.Resource):
 
          return obj_uuid
     #end _resource_create
+
+    def mutex(self):
+        if ContrailResource._mutex is None:
+            ContrailResource._mutex = Lock()
+        return ContrailResource._mutex
