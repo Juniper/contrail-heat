@@ -28,12 +28,6 @@ parameters:
   right_vn2_fqdn:
     type: string
     description: FQ Name of the right network
-  image:
-    type: string
-    description: Name of the image
-  flavor:
-    type: string
-    description: Flavor
   
   domain:
     type: string

@@ -98,12 +98,6 @@ parameters:
   svm2_name: 
     type: string
     description: Name of SVM2
-  flavor: 
-    type: string
-    description: Flavor of the end VMs
-  image: 
-    type: string
-    description: Name of the end VM image
   left_vm_name:
     type: string
     description: Name of the left VM

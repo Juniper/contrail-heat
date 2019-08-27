@@ -114,42 +114,6 @@ parameters:
   domain:
     type: string
     description: Name of the Domain
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
-    type: string
-    description: subnet prefix for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_1:
-    type: string
-    description: subnet prefix len for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_2:
-    type: string
-    description: subnet prefix for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_2:
-    type: string
-    description: subnet prefix len for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_3:
-    type: string
-    description: subnet prefix for right network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_3:
-    type: string
-    description: subnet prefix len for right network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
-    type: string
-    description: subnet prefix for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_1:
-    type: string
-    description: subnet prefix len for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_2:
-    type: string
-    description: subnet prefix for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_2:
-    type: string
-    description: subnet prefix len for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_3:
-    type: string
-    description: subnet prefix for right network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_3:
-    type: string
-    description: subnet prefix len for right network
   port_tuple_name:
     type: string
     description: name of Port Tuple

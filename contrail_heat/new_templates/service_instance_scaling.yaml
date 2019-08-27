@@ -91,45 +91,9 @@ parameters:
   service_instance_properties_interface_list_allowed_address_pairs_allowed_address_pair_address_mode_3:
     type: string
     description: address_mode for the ServiceInstance
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
-    type: string
-    description: subnet prefix for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_1:
-    type: string
-    description: subnet prefix len for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_2:
-    type: string
-    description: subnet prefix for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_2:
-    type: string
-    description: subnet prefix len for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_3:
-    type: string
-    description: subnet prefix for right network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_3:
-    type: string
-    description: subnet prefix len for right network
   domain:
     type: string
     description: Name of the Domain
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
-    type: string
-    description: subnet prefix for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_1:
-    type: string
-    description: subnet prefix len for mgmt network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_2:
-    type: string
-    description: subnet prefix for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_2:
-    type: string
-    description: subnet prefix len for left network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_3:
-    type: string
-    description: subnet prefix for right network
-  network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_len_3:
-    type: string
-    description: subnet prefix len for right network
   network_ipam_refs_data_ipam_subnets_subnet_ip_prefix_1:
     type: string
     description: subnet prefix for mgmt network
