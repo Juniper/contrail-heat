@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17abd01c_ac9522be",
+        "filename": "contrail_heat/resources/contrail.py",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2019-11-21T15:41:05Z",
+      "side": 1,
+      "message": "excpetions -\u003e exceptions",
+      "range": {
+        "startLine": 11,
+        "startChar": 13,
+        "endLine": 11,
+        "endChar": 24
+      },
+      "revId": "7dc7d54bbd1d9aaf51535ff2c05935acb7047234",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
