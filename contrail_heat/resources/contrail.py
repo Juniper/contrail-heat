@@ -1,6 +1,5 @@
 import ConfigParser
 
-from cfgm_common import exceptions as cfgm_exp
 from heat.engine import resource
 from heat.engine.properties import Properties
 try:
@@ -8,7 +7,8 @@ try:
 except ImportError:
     from oslo_log import log as logging
 from vnc_api import vnc_api
-from vnc_api.vnc_api import NoIdError, RefsExistError
+from vnc_api.exceptions import NoIdError
+from vnc_api.exceptions import RefsExistError
 import uuid
 from threading import Lock
 
