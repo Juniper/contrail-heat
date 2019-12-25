@@ -128,9 +128,9 @@ class ContrailVirtualDnsRecord(contrail.ContrailResource):
         parent_obj = None
         if parent_obj is None and self.properties.get(self.VIRTUAL_DNS):
             try:
-                parent_obj = self.vnc_lib().virtual_dns_read(id=self.properties.get(self.VIRTUAL_DNS))
+                parent_obj = self.vnc_lib().virtual_DNS_read(id=self.properties.get(self.VIRTUAL_DNS))
             except vnc_api.NoIdError:
-                parent_obj = self.vnc_lib().virtual_dns_read(fq_name_str=self.properties.get(self.VIRTUAL_DNS))
+                parent_obj = self.vnc_lib().virtual_DNS_read(fq_name_str=self.properties.get(self.VIRTUAL_DNS))
             except:
                 parent_obj = None
 
