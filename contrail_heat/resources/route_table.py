@@ -4,7 +4,6 @@ except ImportError:
     pass
 from heat.engine import attributes
 from heat.engine import constraints
-from novaclient import exceptions as nova_exceptions
 from heat.engine import properties
 try:
     from heat.openstack.common import log as logging

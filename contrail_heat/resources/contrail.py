@@ -1,4 +1,4 @@
-import ConfigParser
+from six.moves import configparser
 
 from heat.engine import resource
 from heat.engine.properties import Properties
@@ -14,7 +14,7 @@ from threading import Lock
 
 LOG = logging.getLogger(__name__)
 
-cfg_parser = ConfigParser.ConfigParser()
+cfg_parser = configparser.ConfigParser()
 cfg_parser.read("/etc/heat/heat.conf")
 
 def set_auth_token(func):
@@ -88,8 +88,8 @@ class ContrailResource(resource.Resource):
         try:
             val = cfg_parser.get(section, option)
         except (AttributeError,
-                ConfigParser.NoOptionError,
-                ConfigParser.NoSectionError):
+                configparser.NoOptionError,
+                configparser.NoSectionError):
             val = default
 
         return val
