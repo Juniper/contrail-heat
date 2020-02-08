@@ -1,2 +1,0 @@
-heat
-contrail-api-client
