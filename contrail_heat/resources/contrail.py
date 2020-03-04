@@ -21,7 +21,8 @@ def set_auth_token(func):
     def wrapper(self, *args, **kwargs):
         self.mutex().acquire()
         try:
-            self.vnc_lib().set_auth_token(self.stack.context.auth_token)
+            self.vnc_lib().set_auth_token(
+                self.stack.context.keystone_session.get_token())
             return func(self, *args, **kwargs)
         finally:
             self.mutex().release()
