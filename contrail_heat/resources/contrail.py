@@ -130,7 +130,7 @@ class ContrailResource(resource.Resource):
 
     @staticmethod
     def _ignore_not_found(ex):
-        if not isinstance(ex, cfgm_exp.NoIdError):
+        if not isinstance(ex, NoIdError):
             raise ex
 
     def vnc_lib(self):
